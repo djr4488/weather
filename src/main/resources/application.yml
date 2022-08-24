@@ -1,0 +1,7 @@
+WeatherController:
+  apiKey: "your open weather maps api key goes here"
+resteasy-json:
+  default-json: false
+quarkus:
+  http:
+    cors: true
