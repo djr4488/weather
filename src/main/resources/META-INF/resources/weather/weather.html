@@ -21,27 +21,36 @@
   </div>
   <hr>
   <div class="row">
-    <div class="row">
-      <div class="col" id="alertView">
+    <div class="col" id="alertView">
 
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <h4 id="current-location"></h4>
+    <div id="current-conditions" class="col">
+      <div class="row">
+        <div id="current-conditions-image" class="col"></div>
+          <div class="col" id="cur_temps">
+            <div class="row">
+              <div class="col" id="cur_temp"></div>
+            </div>
+            <div class="row">
+              <div class="col" id="cur_LHFL"></div>
+            </div>
+          </div>
       </div>
     </div>
-    <div class="row">
-      <h4>Current Conditions</h4>
-      <div id="current_col_img" class="col"></div>
-      <div id="hourly0Img" class="col"></div>
-      <div id="hourly1Img" class="col"></div>
-      <div id="hourly2Img" class="col"></div>
-      <div id="hourly3Img" class="col"></div>
-    </div>
+    <div id="hourly0Img" class="col"></div>
+    <div id="hourly1Img" class="col"></div>
+    <div id="hourly2Img" class="col"></div>
+    <div id="hourly3Img" class="col"></div>
+  </div>
     <div class="row">
       <div class="col">
         <div class="location"></div>
-        <div class="sunRiseSet"></div>
-        <div class="currentTemperature"></div>
-        <div class="lowTemperature"></div>
-        <div class="highTemperature"></div>
-        <div class="feelsLike"></div>
+        <div class="sunrise"><i class="bi bi-sunrise"></i></div>
+        <div class="sunset"></div>
         <div class="pressure"></div>
         <div class="humidity"></div>
         <div class="wind"></div>
@@ -82,7 +91,6 @@
         <div class="hourly3Weather"></div>
       </div>
     </div>
-  </div>
   <hr>
   <div class="row">
     <h4>Outlook Next 5 Days</h4>
@@ -168,17 +176,15 @@
               console.log(data.current.weather[0]);
               var iconUrl = '../images/' + data.current.weather[0].icon + '.svg';
               document.querySelector(
-                      ".location"
-              ).innerText = `Current Weather Conditions For: ${data.name}`;
+                      "#current-location"
+              ).innerText = `Current Conditions For ${data.name}`;
               document.querySelector(
-                      ".sunRiseSet"
-              ).innerText = `Sunrise: ` + new Date(data.current.sunrise * 1000).toLocaleString() + ` Sunset: ` + new Date(data.current.sunset * 1000).toLocaleString();
+                      ".sunrise"
+              ).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sunrise" viewBox="0 0 16 16"><path d="M7.646 1.146a.5.5 0 0 1 .708 0l1.5 1.5a.5.5 0 0 1-.708.708L8.5 2.707V4.5a.5.5 0 0 1-1 0V2.707l-.646.647a.5.5 0 1 1-.708-.708l1.5-1.5zM2.343 4.343a.5.5 0 0 1 .707 0l1.414 1.414a.5.5 0 0 1-.707.707L2.343 5.05a.5.5 0 0 1 0-.707zm11.314 0a.5.5 0 0 1 0 .707l-1.414 1.414a.5.5 0 1 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zM8 7a3 3 0 0 1 2.599 4.5H5.4A3 3 0 0 1 8 7zm3.71 4.5a4 4 0 1 0-7.418 0H.499a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1h-3.79zM0 10a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 0 10zm13 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/></svg>${ new Date(data.current.sunrise * 1000).toLocaleString()}`;
+
               document.querySelector(
-                      ".currentTemperature"
-              ).innerText = `Current Temperature: ${data.current.temp}`;
-              document.querySelector(
-                      ".feelsLike"
-              ).innerText = `Feels Like: ${data.current.feels_like}`;
+                      ".sunset"
+              ).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-sunset" viewBox="0 0 16 16"><path d="M7.646 4.854a.5.5 0 0 0 .708 0l1.5-1.5a.5.5 0 0 0-.708-.708l-.646.647V1.5a.5.5 0 0 0-1 0v1.793l-.646-.647a.5.5 0 1 0-.708.708l1.5 1.5zm-5.303-.51a.5.5 0 0 1 .707 0l1.414 1.413a.5.5 0 0 1-.707.707L2.343 5.05a.5.5 0 0 1 0-.707zm11.314 0a.5.5 0 0 1 0 .706l-1.414 1.414a.5.5 0 1 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zM8 7a3 3 0 0 1 2.599 4.5H5.4A3 3 0 0 1 8 7zm3.71 4.5a4 4 0 1 0-7.418 0H.499a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1h-3.79zM0 10a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1 0 10zm13 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/></svg>${ new Date(data.current.sunset * 1000).toLocaleString()}`;
               document.querySelector(
                       ".pressure"
               ).innerText = `Pressure: ${data.current.pressure}`;
@@ -191,6 +197,12 @@
               document.querySelector(
                       ".currentWeather"
               ).innerText = `Weather: ${data.current.weather[0].description}`;
+              document.querySelector(
+                      "#cur_temp"
+              ).innerHTML = `<h6>${data.current.temp}</h6>`;
+              document.querySelector(
+                      "#cur_LHFL"
+              ).innerText = `L:${data.daily[0].temp.min} | H:${data.daily[0].temp.max} | FL:${data.current.feels_like}`;
               var windText = `Wind Direction: ${data.current.wind_deg} At ${data.current.wind_speed} mph`;
               if (data.current.wind_gust != null) {
                 windText += ` Wind Gusts To: ${data.current.wind_gust}`;
@@ -199,8 +211,8 @@
                       ".wind"
               ).innerText = windText;
               document.querySelector(
-                      "#current_col_img"
-              ).style = "background-image:url('" + iconUrl + "');background-repeat:no-repeat;width:200px;height:100px;";
+                      "#current-conditions-image"
+              ).innerHTML = `<img src="${iconUrl}" class="img-thumbnail" alt="..." width="100px" height="100px"/>`;
               for (let idx=1; idx <= 5; idx++) {
                 var dailyIconUrl = '../images/' + data.daily[idx].weather[0].icon + '.svg';
                 var sunriseSet = '.day' + idx + 'SunriseSet';
