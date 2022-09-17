@@ -19,18 +19,11 @@ public class WeatherResource {
     Logger log;
 
     @GET
-    @Path("weather/current/{zipCode}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String weather(@PathParam("zipCode") String zipCode) {
-        return weatherController.getWeather(zipCode).toString();
-    }
-
-    @GET
     @Path("weather/full/{zipCode}")
     @Produces(MediaType.APPLICATION_JSON)
     public OpenWeatherOneCallResponse weatherFull(@PathParam("zipCode") String zipCode) {
         OpenWeatherOneCallResponse response = weatherController.getFullWeather(zipCode);
-        log.info("weatherFull() completed with response:{}", response);
+        log.info("weatherFull() completed with response.name:{}", response.getName());
         return response;
     }
 }
