@@ -1,5 +1,5 @@
 WeatherController:
-  apiKey: "your open weather maps api key goes here"
+  apiKey: "your openweathermap key here"
 resteasy-json:
   default-json: false
 quarkus:
