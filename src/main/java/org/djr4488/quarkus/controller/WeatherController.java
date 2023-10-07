@@ -59,7 +59,7 @@ public class WeatherController {
 
         log.info("getFullWeather() weatherLocation:{}", weatherLocation);
         OpenWeatherOneCallResponse response = oneCallClient.getOneCallResponse(weatherLocation.getLat(), weatherLocation.getLon(), apiKey, "imperial");
-        response.setName(weatherLocation.getLocationName());
+        response.setPlace(weatherLocation.getLocationName());
         final LocalDateTime sunrise = response.getCurrent().getSunrise();
         final LocalDateTime sunset = response.getCurrent().getSunset();
         response.getCurrent().setIsDaytime(WeatherUtils.isDaytime(sunrise, sunset));

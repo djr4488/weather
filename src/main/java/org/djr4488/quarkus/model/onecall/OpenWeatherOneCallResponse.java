@@ -27,8 +27,8 @@ public class OpenWeatherOneCallResponse implements Serializable {
     private String timezone;
     @JsonbProperty("timezone_offset")
     private Long timezoneOffset;
-    @JsonbProperty
-    private String name;
+    @JsonbProperty("name")
+    private String place;
     @JsonbProperty
     private Current current;
     @JsonbProperty
@@ -37,6 +37,8 @@ public class OpenWeatherOneCallResponse implements Serializable {
     private List<Hourly> hourly;
     @JsonbProperty
     private List<Alert> alerts;
+    @JsonbProperty
+    private boolean hasAlerts = alerts != null && !alerts.isEmpty();
 
     @Override
     public String toString() {

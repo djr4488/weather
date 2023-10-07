@@ -12,11 +12,11 @@ import java.util.Locale;
 public class SecondsAdapter implements JsonbAdapter<LocalDateTime, Long> {
     @Override
     public Long adaptToJson(LocalDateTime localDateTime) throws Exception {
-        return localDateTime.toEpochSecond(ZoneOffset.UTC);
+        return localDateTime.toEpochSecond(ZoneOffset.systemDefault().getRules().getOffset(LocalDateTime.now()));
     }
 
     @Override
     public LocalDateTime adaptFromJson(Long epochSeconds) throws Exception {
-        return LocalDateTime.ofEpochSecond(epochSeconds, 0, ZoneOffset.UTC);
+        return LocalDateTime.ofEpochSecond(epochSeconds, 0, ZoneOffset.systemDefault().getRules().getOffset(LocalDateTime.now()));
     }
 }

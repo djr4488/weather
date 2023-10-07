@@ -21,7 +21,8 @@ import java.util.List;
 @Data
 public class Hourly implements Serializable {
     @JsonbProperty
-    private String dt;
+    @JsonbTypeAdapter(SecondsAdapter.class)
+    private LocalDateTime dt;
     @JsonbProperty
     @JsonbTypeAdapter(SecondsAdapter.class)
     private LocalDateTime sunrise;
@@ -46,6 +47,8 @@ public class Hourly implements Serializable {
     private BigDecimal windSpeed;
     @JsonbProperty("wind_deg")
     private Long windDeg;
+    @JsonbProperty("offsetWindDeg")
+    private Long offsetWindDeg;
     @JsonbProperty("wind_gust")
     private BigDecimal windGust;
     @JsonbProperty
@@ -67,7 +70,11 @@ public class Hourly implements Serializable {
     @JsonbProperty
     private List<Weather> weather;
 
-    @Override
+    public Long getOffsetWindDeg() {
+        return windDeg >= 0 && windDeg < 180 ? windDeg + 180 : windDeg - 180;
+    }
+
+        @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.JSON_STYLE);
     }

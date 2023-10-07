@@ -50,6 +50,8 @@ public class Current implements Serializable {
     private BigDecimal windSpeed;
     @JsonbProperty("wind_deg")
     private Long windDeg;
+    @JsonbProperty
+    private Long offsetWindDeg;
     @JsonbProperty("wind_gust")
     private BigDecimal windGust;
     @JsonbProperty
@@ -60,6 +62,10 @@ public class Current implements Serializable {
     private Snow snow;
     @JsonbProperty
     private Boolean isDaytime;
+
+    public Long getOffsetWindDeg() {
+        return windDeg >=0 && windDeg < 180 ? windDeg + 180 : windDeg - 180;
+    }
 
     @Override
     public String toString() {
