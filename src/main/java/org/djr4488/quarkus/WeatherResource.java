@@ -4,6 +4,7 @@ import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import org.djr4488.quarkus.controller.WeatherController;
+import org.djr4488.quarkus.model.AudioResponse;
 import org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse;
 import org.slf4j.Logger;
 
@@ -22,6 +23,7 @@ public class WeatherResource {
     @CheckedTemplate(requireTypeSafeExpressions = false)
     public static class Templates {
         public static native TemplateInstance weather(OpenWeatherOneCallResponse weather);
+        public static native TemplateInstance audio(AudioResponse audio);
     }
 
     @Inject
@@ -37,6 +39,32 @@ public class WeatherResource {
         OpenWeatherOneCallResponse response = weatherController.getFullWeather(zipCode);
         log.info("weatherFull() completed with response.name:{}", response.getPlace());
         return Templates.weather(response);
+    }
+
+    @GET
+    @Path("audio/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public TemplateInstance audio(@PathParam("id") int id) {
+        AudioResponse response = new AudioResponse();
+        switch (id) {
+            case 1:
+                response.setAudioSource("/audio/05 Local Forecast (Nighttime).mp3");
+                break;
+            case 2:
+                response.setAudioSource("/audio/07 Regional Forecast (Nighttime).mp3");
+                break;
+            case 3:
+                response.setAudioSource("/audio/05 Local Forecast (Nighttime).mp3");
+                break;
+            case 4:
+                response.setAudioSource("/audio/09_Global_Forecast_Nighttime.mp3");
+                break;
+            default:
+                response.setAudioSource("/audio/11_Global_Forecast_Nighttime_Layer_Only.mp3");
+                break;
+        }
+        return Templates.audio(response);
     }
 
     @GET

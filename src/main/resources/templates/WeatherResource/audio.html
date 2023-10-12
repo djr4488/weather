@@ -1,0 +1,18 @@
+{@org.djr4488.quarkus.model.AudioResponse audio}
+<div class="row">
+    <div class="col">
+        <h3>Audio Controls</h3>
+        <audio id="audioControls" controls class="w-100">
+            <source id="audioSource"
+                    src="{audio.audioSource}"
+                    type="audio/mpeg" />
+        </audio>
+    </div>
+    <div class="col">
+        <h3>Play List</h3>
+        <button class="btn btn-link" type="submit" id="audioTrack1" value="1" onclick="getAudio(1)">Play Track 1</button>
+        <button class="btn btn-link" type="submit" id="audioTrack2" value="2" onclick="getAudio(2)">Play Track 2</button>
+        <button class="btn btn-link" type="submit" id="audioTrack3" value="3" onclick="getAudio(3)">Play Track 3</button>
+        <button class="btn btn-link" type="submit" id="audioTrack4" value="4" onclick="getAudio(4)">Play Track 4</button>
+    </div>
+</div>

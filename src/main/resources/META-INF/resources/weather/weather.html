@@ -7,349 +7,63 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-<embed src="/audio/09_Global_Forecast_Nighttime.mp3" loop="true" autostart="true" width="2" height="0">
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <h1>Quarkus Weather</h1> <h3>(powered by openweathermap.org)</h3>
-      <form>
-        <label>Zip Code: </label>
-        <input id="zipCode" type="text" />
-        <input id="submitZipcode" type="submit" value="Get Weather" />
-      </form>
-    </div>
-  </div>
-  <hr>
-  <div class="row">
-    <div class="col" id="alertView">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <embed src="/audio/09_Global_Forecast_Nighttime.mp3" loop="true" autostart="true" width="2" height="0">
+  <div id="weatherContainerFluid" class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <h1>Weather</h1> <h3>(powered by Quarkus)</h3>
+        <form>
+          <label>Zip Code: </label>
+          <input id="zipCode" type="text" />
+          <button class="btn btn-outline-light" type="submit" id="submitZipCode">Submit</button>
+        </form>
+      </div>
+      <div id="audioControlCol" class="col">
 
-    </div>
-    <div class="col" id="mapView">
-
-    </div>
-  </div>
-  <hr>
-  <div class="row row-cols-5">
-    <div class="col">
-      <h4 id="current-location"></h4>
-    </div>
-    <div class="col">
-      <h4 id="current-hourly"></h4>
-    </div>
-  </div>
-  <div class="row">
-    <div id="current-conditions" class="col">
-      <div class="row">
-        <div id="current-conditions-image" class="col"></div>
-          <div class="col" id="cur_temps">
-            <div class="row">
-              <div class="col" id="cur_temp"></div>
-            </div>
-            <div class="row">
-              <div class="col" id="cur_LHFL"></div>
-            </div>
-          </div>
       </div>
     </div>
-    <div id="hourly0Img" class="col"></div>
-    <div id="hourly1Img" class="col"></div>
-    <div id="hourly2Img" class="col"></div>
-    <div id="hourly3Img" class="col"></div>
+    <hr>
+    <div id="weatherData" class="row"></div>
   </div>
-  <div class="row" id="current-and-hourly-conditions-row">
-    <div class="col" id="current-conditions-column"></div>
-    <div class="col">
-      <div class="hourly0HourStamp"></div>
-      <div class="hourly0Temp"></div>
-      <div class="hourly0POP"></div>
-      <div class="hourly0Uvi"></div>
-      <div class="hourly0Wind"></div>
-      <div class="hourly0Weather"></div>
-    </div>
-    <div class="col">
-      <div class="hourly1HourStamp"></div>
-      <div class="hourly1Temp"></div>
-      <div class="hourly1POP"></div>
-      <div class="hourly1Uvi"></div>
-      <div class="hourly1Wind"></div>
-      <div class="hourly1Weather"></div>
-    </div>
-    <div class="col">
-      <div class="hourly2HourStamp"></div>
-      <div class="hourly2Temp"></div>
-      <div class="hourly2POP"></div>
-      <div class="hourly2Uvi"></div>
-      <div class="hourly2Wind"></div>
-      <div class="hourly2Weather"></div>
-    </div>
-    <div class="col">
-      <div class="hourly3HourStamp"></div>
-      <div class="hourly3Temp"></div>
-      <div class="hourly3POP"></div>
-      <div class="hourly3Uvi"></div>
-      <div class="hourly3Wind"></div>
-      <div class="hourly3Weather"></div>
-    </div>
-  </div>
-  <hr>
-  <div class="row" id="five-day-forecast-images"></div>
-  <div class="row" id="five-day-outlook-forecasts"></div>
-</div>
+</body>
 <script>
   document.addEventListener("submit", sendData);
+  getAudio(1);
   function sendData(e) {
     e.preventDefault();
     const zip = document.querySelector("#zipCode").value;
 
-    fetch("/weather/camel/1.0/" + zip, {
+    fetch("/api/2.0/weather?zipCode=" + zip, {
       method: "GET",
       headers: {
         "Accept": "application/json"
       }
     })
-            .then(res => res.json())
-            .then(data => {
-              var degreeOffset=0;
-              if (data.current.wind_deg >=0 && data.current.wind_deg < 180) {
-                degreeOffset = 180;
-              } else {
-                degreeOffset = -180;
-              }
-              var rotateImageDeg = data.current.wind_deg + degreeOffset;
-              var rotateStyle = "transform: rotate(" + rotateImageDeg + "deg);";
-              var windText = `<img src="../images/compass.svg" alt="Wind Direction ${data.current.wind_deg}" style="${rotateStyle}" height="32px" width="32px"/> At ${data.current.wind_speed} mph`;
-              if (data.current.wind_gust != null) {
-                windText += ` gusts to ${data.current.wind_gust} mph`;
-              }
-              var currentConditionsColumnDiv=`
-              <div class="row">
-                <div class="col" id="current_sun"><h6>Sunrise and Sunset</h6></div>
-              </div>
-              <div class="row">
-                <div class="col"><img src="../images/sunrise.svg" alt="..." height="32px" width="32px"/> ${ new Date(data.current.sunrise * 1000).toLocaleTimeString()}</div>
-                <div class="col"><img src="../images/sunset.svg" alt="..." height="32px" width="32px"/> ${ new Date(data.current.sunset * 1000).toLocaleTimeString()}</div>
-              </div>
-              <div class="row">
-                <div class="col"><h6>Pressure</h6></div>
-                <div class="col"><h6>Humidity</h6></div>
-              </div>
-              <div class="row">
-                <div class="col" id="current-pressure-data">${data.current.pressure}</div>
-                <div class="col" id="current-humidity-data">${data.current.humidity}</div>
-              </div>
-              <div class="row">
-                <div class="col"><h6>Wind</h6></div>
-                <div class="col"><h6>UV Index</h6></div>
-              </div>
-              <div class="row">
-                <div class="col" id="current-wind">${windText}</div>
-                <div class="col" id="current-uv-index">${data.current.uvi}</div>
-              </div>
-              <div class="row">
-                <div class="col"><h6>Weather Description</h6></div>
-              </div>
-              <div class="row">
-                <div class="col" id="current-weather-description">${data.current.weather[0].description}</div>
-              </div>`;
-              console.log(data.current);
-              console.log(data.current.weather[0]);
-              var iconUrl = '../images/' + data.current.weather[0].icon + '.svg';
-              document.querySelector(
-                      "#current-location"
-              ).innerText = `Currently For ${data.name}`;
-              document.querySelector(
-                      "#current-hourly"
-              ).innerText = `Hourly Outlook`;
-              document.querySelector(
-                      "#cur_temp"
-              ).innerHTML = `<h6>${data.current.temp}</h6>`;
-              document.querySelector(
-                      "#cur_LHFL"
-              ).innerText = `L:${data.daily[0].temp.min} | H:${data.daily[0].temp.max} | FL:${data.current.feels_like}`;
-              document.querySelector(
-                      "#current-conditions-image"
-              ).innerHTML = `<img src="${iconUrl}" class="img-thumbnail" alt="..." width="100px" height="100px"/>`;
-              document.querySelector(
-                      "#current-conditions-column"
-              ).innerHTML = currentConditionsColumnDiv;
-              <!-- daily -->
-              var weekOutlookImages = '<h4 id="five-day-outlook">5 day outlook</h4>';
-              var weekOutlook = '';
-              for (let idx=1; idx <= 5; idx++) {
-                var dailyIconUrl = '../images/' + data.daily[idx].weather[0].icon + '.svg';
-                var sunriseTag = '#day' + idx + '-sunrise';
-                var sunsetTag = '#day' + idx + '-sunset';
-                var moonriseTag = '#day' + idx + '-moonrise';
-                var moonsetTag = '#day' + idx + '-moonset';
-                var moonphaseTag = '#day' + idx + '-moonphase';
-                var moonphaseValue;
-                var moonPhase = data.daily[idx].moon_phase;
-                var moonPhaseImg;
-                if (moonPhase == 0) {
-                  moonphaseValue = 'new moon';
-                  moonPhaseImg = 'moon-new.svg';
-                } else if (moonPhase > 0 && moonPhase < 0.25) {
-                  moonphaseValue = 'waxing crescent';
-                  moonPhaseImg = 'moon-waxing-crescent.svg';
-                } else if (moonPhase == .25) {
-                  moonphaseValue = 'first quarter';
-                  moonPhaseImg = 'moon-first-quarter.svg';
-                } else if (moonPhase > .25 && moonPhase < 0.5) {
-                  moonphaseValue = 'waxing gibbous';
-                  moonPhaseImg = 'moon-waxing-gibbous.svg';
-                } else if (moonPhase == .5) {
-                  moonphaseValue = 'full moon';
-                  moonPhaseImg = 'moon-full.svg';
-                } else if (moonPhase > .5 && moonPhase < 0.75) {
-                  moonphaseValue = 'waning gibbous';
-                  moonPhaseImg = 'moon-waning-gibbous.svg';
-                } else if (moonPhase == .75) {
-                  moonphaseValue = 'last quarter';
-                  moonPhaseImg = 'moon-last-quarter.svg';
-                } else if (moonPhase > .75 && moonPhase < 1.0) {
-                  moonphaseValue = 'waning crescent';
-                  moonPhaseImg = 'moon-waning-crescent.svg';
-                }
-                var degreeOffsetDaily=0;
-                if (data.current.wind_deg >=0 && data.current.wind_deg < 180) {
-                  degreeOffsetDaily = 180;
-                } else {
-                  degreeOffsetDaily = -180;
-                }
-                var rotateImageDegDaily = data.daily[idx].wind_deg + degreeOffsetDaily;
-                var rotateStyleDaily = "transform: rotate(" + rotateImageDegDaily + "deg);";
-                var windTextDaily = `<img src="../images/compass.svg" alt="Wind Direction ${data.daily[idx].wind_deg}" style="${rotateStyleDaily}" height="32px" width="32px"/> At ${data.daily[idx].wind_speed} mph`;
-                const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                var dayOfWeek = weekday[new Date(data.daily[idx].dt * 1000).getDay()];
-                var dateOfWeekday = new Date(data.daily[idx].dt * 1000).toLocaleDateString();
-                var dailyOutlookDiv = `
-                  <div class="col">
-                    <div class="row border">
-                      <div class="col">${dayOfWeek} ${dateOfWeekday}</div>
-                    </div>
-                    <div class="row border">
-                        <div class="col">
-                            <div class="row">
-                              <div class="col text-center"><h6>Sunrise and Sunset</h6></div>
-                            </div>
-                            <div class="row">
-                              <div class="col"><img src="../images/sunrise.svg" alt="Sunrise: " height="32px" width="32px"/> ${new Date(data.daily[idx].sunrise * 1000).toLocaleTimeString()}</div>
-                              <div class="col"><img src="../images/sunset.svg" alt="Sunset: " height="32px" width="32px"/> ${new Date(data.daily[idx].sunset * 1000).toLocaleTimeString()}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row border">
-                      <div class="col">
-                        <div class="row">
-                          <div class="col text-center"><h6>Moonrise and Moonset</h6></div>
-                        </div>
-                        <div class="row">
-                          <div class="col"><img src="../images/moonrise.svg" alt="Moonrise: " height="32px" width="32px"/> ${new Date(data.daily[idx].moonrise * 1000).toLocaleTimeString()}</div>
-                          <div class="col"><img src="../images/moonset.svg" alt="Moonset:" height="32px" width="32px"/> ${new Date(data.daily[idx].moonset * 1000).toLocaleTimeString()}</div>
-                        </div>
-                        <div class="row">
-                          <div class="col text-center"><h6>Moonphase</h6></div>
-                        </div>
-                        <div class="row">
-                          <div class="col"><img src='../images/${moonPhaseImg}' alt='${moonphaseValue}' width="32px" height="'32px"/>${moonphaseValue}</div>
-                        </div>
-                       </div>
-                    </div>
-                    <div class="row border">
-                      <div class="col">
-                        <div class="row">
-                          <div class="col text-center"><h6>Temps.</h6></div>
-                        </div>
-                        <div class="row">
-                          <div class="col text-center"><h6>Low</h6></div>
-                          <div class="col text-center"><h6>High</h6></div>
-                        </div>
-                        <div class="row">
-                          <div class="col text-center">${data.daily[idx].temp.min}</div>
-                          <div class="col text-center">${data.daily[idx].temp.max}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row border">
-                      <div class="col">
-                        <div class="row">
-                            <div class="col text-center"><h6>Precipitation Chance</h6></div>
-                            <div class="col text-center"><h6>Wind</h6></div>
-                        </div>
-                        <div class="row">
-                          <div class="col text-center">${data.daily[idx].pop}</div>
-                          <div class="col text-center">${windTextDaily}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row border">
-                      <div class="col">
-                        <div class="row ">
-                          <div class="col text-center"><h6>UV Index</h6></div>
-                          <div class="col text-center"><h6>Weather</h6></div>
-                        </div>
-                        <div class="row">
-                           <div class="col text-center">${data.daily[idx].uvi}</div>
-                           <div class="col text-center">${data.daily[idx].weather[0].description}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>`;
-                weekOutlook += dailyOutlookDiv;
-                weekOutlookImages += `<div class="col"><img src="${dailyIconUrl}" alt="${data.daily[idx].weather[0].description}" width="100px" height="100px"/></div>`;
-              }
-              document.querySelector(
-                      '#five-day-forecast-images'
-              ).innerHTML = weekOutlookImages;
-              document.querySelector(
-                      '#five-day-outlook-forecasts'
-              ).innerHTML = weekOutlook;
+    .then(res => res.text())
+    .then(data => {
+      document.querySelector(
+              '#weatherData'
+      ).innerHTML = data;
+    })
+    .catch(err => console.log(err));
+  }
 
-              <!-- hourly -->
-              for (let idx=0; idx <= 3; idx++) {
-                var hourlyIconUrl = '../images/' + data.hourly[idx].weather[0].icon + '.svg';
-                document.querySelector(
-                        '.hourly' + idx + 'HourStamp'
-                ).innerText = new Date(data.hourly[idx].dt * 1000).toLocaleString();
-                document.querySelector(
-                        ".hourly" + idx + "Temp"
-                ).innerText = `Temp: ${data.hourly[idx].temp}`;
-                document.querySelector(
-                        ".hourly" + idx + "POP"
-                ).innerText = `Precipitation Probability: ${data.hourly[idx].pop}`;
-                document.querySelector(
-                        ".hourly" + idx + "Uvi"
-                ).innerText = `UV Index: ${data.hourly[idx].uvi}`;
-                document.querySelector(
-                        ".hourly" + idx + "Weather"
-                ).innerText = `Weather: ${data.hourly[idx].weather[0].description}`;
-                document.querySelector(
-                        "#hourly" + idx + "Img"
-                ).style = "background-image:url('" + hourlyIconUrl + "');background-repeat:no-repeat;width:200px;height:100px;";
-              }
-              let alertViewRemover = document.getElementById('alertView');
-              while (alertViewRemover.firstChild) {
-                alertViewRemover.removeChild(alertViewRemover.firstChild);
-              }
-              console.log(data.alerts.length);
-              for (let idx=data.alerts.length - 1; idx >= 0; idx--) {
-                var alertType = 'warning';
-                if (data.alerts[idx].event.includes('Warning')) {
-                  alertType = 'danger';
-                }
-                document.querySelector("#alertView").innerHTML =
-                        `<div class="alert alert-${alertType}" role="alert">` +
-                            `<h4 class="alert-heading">${data.alerts[idx].sender_name}</h4>` +
-                            `<p>${data.alerts[idx].event}</p>` +
-                            `<p class="mb-0">Start: ${new Date(data.alerts[idx].start * 1000).toLocaleString()} End: ${new Date(data.alerts[idx].end * 1000).toLocaleString()}</p>` +
-                            `<hr>` +
-                            `<p class="mb-0">${data.alerts[idx].description}</p>` +
-                        `</div>`;
-              }
-            })
-            .catch(err => console.log(err));
+  function getAudio(track) {
+    fetch("/api/2.0/audio/" + track, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    })
+    .then(res => res.text())
+    .then(data => {
+      document.querySelector('#audioControlCol')
+              .innerHTML = data;
+    })
+    .catch(err => {
+      console.log(err);
+    });
   }
 </script>
-</body>
 </html>

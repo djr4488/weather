@@ -37,8 +37,10 @@ public class OpenWeatherOneCallResponse implements Serializable {
     private List<Hourly> hourly;
     @JsonbProperty
     private List<Alert> alerts;
-    @JsonbProperty
-    private boolean hasAlerts = alerts != null && !alerts.isEmpty();
+
+    public Integer getAlertSize() {
+        return (alerts == null || alerts.size() == 0) ? 0 : alerts.size();
+    }
 
     @Override
     public String toString() {
