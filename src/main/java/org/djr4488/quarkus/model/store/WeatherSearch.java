@@ -31,8 +31,6 @@ public class WeatherSearch {
     @Column(name = "created_at")
     private LocalDateTime localDateTime;
     @Column(name = "zipcode_search")
-    @Size(min=5, max=5)
-    @Pattern(regexp = "[/d]5")
     private String location;
 
     @Override

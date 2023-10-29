@@ -4,6 +4,7 @@ import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javax.json.bind.JsonbBuilder;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -44,6 +45,6 @@ public class OpenWeatherOneCallResponse implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+        return JsonbBuilder.create().toJson(this);
     }
 }

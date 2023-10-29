@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.bind.JsonbBuilder;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
@@ -69,6 +70,17 @@ public class WeatherController {
         weatherData.setLocalDateTime(txTime);
         databaseService.save(weatherData);
         log.trace("getFullWeather() response:{}", response);
+        return response;
+    }
+
+    public OpenWeatherOneCallResponse loadMostRecentSearchedWeatherDataForLocation(String location) {
+        OpenWeatherOneCallResponse response;
+        WeatherData weatherData = databaseService.findMostRecentWeatherDataForLocation(location);
+        if (weatherData != null) {
+            response = JsonbBuilder.create().fromJson(weatherData.getWeather(), OpenWeatherOneCallResponse.class);
+        } else {
+            response = null;
+        }
         return response;
     }
 }

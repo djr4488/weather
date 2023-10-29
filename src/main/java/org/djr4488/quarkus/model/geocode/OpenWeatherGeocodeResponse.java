@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -19,6 +20,8 @@ public class OpenWeatherGeocodeResponse implements Serializable {
     private String zip;
     @JsonbProperty
     private String name;
+    @JsonbProperty("local_names")
+    private List<String> localNames;
     @JsonbProperty
     private BigDecimal lat;
     @JsonbProperty

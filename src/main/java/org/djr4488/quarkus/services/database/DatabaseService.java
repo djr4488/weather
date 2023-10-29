@@ -1,6 +1,7 @@
 package org.djr4488.quarkus.services.database;
 
 import org.apache.commons.lang3.StringUtils;
+import org.djr4488.quarkus.model.store.WeatherData;
 import org.djr4488.quarkus.model.store.WeatherLocation;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,6 +22,20 @@ public class DatabaseService {
             if (StringUtils.trimToNull(zipCode) != null) {
                 TypedQuery<WeatherLocation> query = em.createNamedQuery("findWeatherLocationByZipCode", WeatherLocation.class);
                 query.setParameter("zipCode", zipCode);
+                return query.getSingleResult();
+            } else {
+                return null;
+            }
+        } catch (NoResultException nrEx) {
+            return null;
+        }
+    }
+
+    public WeatherData findMostRecentWeatherDataForLocation(String location) {
+        try {
+            if (StringUtils.trimToNull(location) != null) {
+                TypedQuery<WeatherData> query = em.createNamedQuery("findMostRecentWeatherDataForLocation", WeatherData.class);
+                query.setParameter("location", location);
                 return query.getSingleResult();
             } else {
                 return null;

@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,6 +27,16 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@NamedQueries({
+        @NamedQuery(name = "findMostRecentWeatherDataForLocation",
+                    query = """
+                                SELECT wd FROM WeatherData wd 
+                                WHERE 
+                                    wd.weatherSearch.location = :location
+                                    AND wd.localDateTime = (SELECT max(wd1.localDateTime) FROM WeatherData wd1 
+                                                            WHERE 
+                                                                wd1.weatherSearch.location = :location)""")
+})
 public class WeatherData {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
