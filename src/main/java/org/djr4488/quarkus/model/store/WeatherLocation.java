@@ -29,7 +29,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @NamedQueries({
         @NamedQuery(name = "findWeatherLocationByZipCode",
-                query = "select weatherLoc from WeatherLocation weatherLoc where weatherLoc.weatherSearch.location = :zipCode")
+                query = "select weatherLoc from WeatherLocation weatherLoc where weatherLoc.weatherSearch.location = :zipCode"),
+        @NamedQuery(name = "findWeatherLocationByLatLon",
+                query = "select weatherLoc from WeatherLocation weatherLoc where weatherLoc.lat = :lat and weatherLoc.lon = :lon"),
+        @NamedQuery(name = "findAllDistinctWeatherLocations",
+                query = """
+                        select distinct weatherLoc.locationName from WeatherLocation weatherLoc
+                        """)
 })
 public class WeatherLocation {
     @Id

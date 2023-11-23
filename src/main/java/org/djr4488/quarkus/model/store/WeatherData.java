@@ -31,11 +31,14 @@ import java.time.LocalDateTime;
         @NamedQuery(name = "findMostRecentWeatherDataForLocation",
                     query = """
                                 SELECT wd FROM WeatherData wd 
+                                JOIN WeatherLocation wl on wd.weatherSearch = wl.weatherSearch
                                 WHERE 
-                                    wd.weatherSearch.location = :location
+                                    wl.locationName = :location
                                     AND wd.localDateTime = (SELECT max(wd1.localDateTime) FROM WeatherData wd1 
+                                                            JOIN WeatherLocation wl1 on wd1.weatherSearch = wl1.weatherSearch
                                                             WHERE 
-                                                                wd1.weatherSearch.location = :location)""")
+                                                                wl1.locationName = :location
+                                                                AND wd1.localDateTime >= :offsetDateTime)""")
 })
 public class WeatherData {
     @Id

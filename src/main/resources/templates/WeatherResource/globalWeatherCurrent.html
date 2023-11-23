@@ -1,0 +1,20 @@
+{@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse globalWeatherCurrent}
+<div class="row">
+    <div class="row">
+        <div id="current-conditions" class="col">
+            <div class="row">
+                <div id="current-location" class="col">{globalWeatherCurrent.place}</div>
+            </div>
+            <div class="row">
+                <div id="current-conditions-image" class="col"><img src="../../images/{globalWeatherCurrent.current.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/></div>
+            </div>
+            <div class="row">
+                <div class="col" id="cur_temp"><h6>{globalWeatherCurrent.current.temp}</h6></div>
+            </div>
+            <div class="row">
+                <div class="col" id="cur_LHFL">L:{globalWeatherCurrent.daily[0].temp.min} | H:{globalWeatherCurrent.daily[0].temp.max} | FL:{globalWeatherCurrent.current.feelsLike}</div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,6 +11,7 @@ import org.djr4488.quarkus.model.globe.Geometry;
 import org.djr4488.quarkus.model.globe.GlobeResponse;
 import org.djr4488.quarkus.model.globe.Properties;
 import org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse;
+import org.djr4488.quarkus.model.store.WeatherLocation;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -25,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Path("api/2.0")
 public class WeatherResource {
@@ -32,6 +34,7 @@ public class WeatherResource {
     @CheckedTemplate(requireTypeSafeExpressions = false)
     public static class Templates {
         public static native TemplateInstance weather(OpenWeatherOneCallResponse weather);
+        public static native TemplateInstance globalWeatherCurrent(OpenWeatherOneCallResponse globalWeatherCurrent);
         public static native TemplateInstance audio(AudioResponse audio);
     }
 
@@ -48,6 +51,15 @@ public class WeatherResource {
         OpenWeatherOneCallResponse response = weatherController.getFullWeather(zipCode);
         log.info("weatherFull() completed with response.name:{}", response.getPlace());
         return Templates.weather(response);
+    }
+
+    @GET
+    @Path("weather/full/{lat}/{lon}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public OpenWeatherOneCallResponse weatherFull(@PathParam("lat") String lat, @PathParam("lon") String lon) {
+        OpenWeatherOneCallResponse response = weatherController.getWeatherFullByLatLon(lat, lon);
+        log.info("weatherFull() lat:{}, lon:{}, response:{}", lat, lon, response);
+        return response;
     }
 
     @GET
@@ -99,7 +111,7 @@ public class WeatherResource {
             List<BigDecimal> coordinates = new ArrayList<>();
             coordinates.add(response.getLon());
             coordinates.add(response.getLat());
-            Properties properties = new Properties(response.getPlace(), response.getLat(), response.getLon(), response.getCurrent().getTemp().toString());
+            Properties properties = new Properties(response.getPlace(), response.getLat(), response.getLon(), response.getCurrent().getTemp().toString(), Templates.globalWeatherCurrent(response).render());
             Geometry geometry = new Geometry("point", coordinates);
             Feature feature = new Feature(properties, geometry);
             List<Feature> features = new ArrayList<>();
@@ -116,26 +128,58 @@ public class WeatherResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public GlobeResponse globeHourWeather() {
-        log.info("globeHourWeather() ");
+        log.info("globeHourWeather()");
         try {
             Thread.sleep(500);
             OpenWeatherOneCallResponse response = null;
             OpenWeatherOneCallResponse olatheResponse = null;
             List<Feature> features = new ArrayList<>();
-            for (String zipCode : GlobalScheduler.zipList) {
-                response = weatherController.loadMostRecentSearchedWeatherDataForLocation(zipCode);
-                log.info("globeWeather() response from database:{}", response);
-                List<BigDecimal> coordinates = new ArrayList<>();
-                coordinates.add(response.getLon());
-                coordinates.add(response.getLat());
-                Properties properties = new Properties(response.getPlace(), response.getLat(), response.getLon(), response.getCurrent().getTemp().toString());
-                Geometry geometry = new Geometry("point", coordinates);
-                Feature feature = new Feature(properties, geometry);
-                features.add(feature);
-                if (response.getPlace().equalsIgnoreCase("olathe")) {
-                    olatheResponse = response;
+            Set<String> locations = weatherController.loadDistinctWeatherLocations();
+            for (String location : locations) {
+                response = weatherController.loadMostRecentSearchedWeatherDataForLocation(location);
+                if (response != null) {
+                    log.info("globeWeather() response from database:{}", response);
+                    List<BigDecimal> coordinates = new ArrayList<>();
+                    coordinates.add(response.getLon());
+                    coordinates.add(response.getLat());
+                    Properties properties = new Properties(response.getPlace(), response.getLat(), response.getLon(), response.getCurrent().getTemp().toString(), Templates.globalWeatherCurrent(response).render());
+                    Geometry geometry = new Geometry("point", coordinates);
+                    Feature feature = new Feature(properties, geometry);
+                    features.add(feature);
+                    if (response.getPlace().equalsIgnoreCase("olathe")) {
+                        olatheResponse = response;
+                    }
                 }
             }
+            return new GlobeResponse(olatheResponse.getPlace(), olatheResponse.getCurrent().getTemp().toString(), olatheResponse.getLat(), olatheResponse.getLon(), features);
+        } catch (Exception ex) {
+            log.error("exception:", ex);
+            return null;
+        }
+    }
+
+    @GET
+    @Path("globeHour/{lat}/{lon}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public GlobeResponse globeHourWeather(@PathParam("lat") String lat, @PathParam("lon") String lon) {
+        log.info("globeHourWeather() lat:{}, lon:{}", lat, lon);
+        try {
+            Thread.sleep(500);
+            OpenWeatherOneCallResponse response = null;
+            OpenWeatherOneCallResponse olatheResponse = null;
+            List<Feature> features = new ArrayList<>();
+            response = weatherController.getWeatherFullByLatLon(lat, lon);
+            log.info("globeWeather() response from database:{}", response);
+            List<BigDecimal> coordinates = new ArrayList<>();
+            coordinates.add(response.getLon());
+            coordinates.add(response.getLat());
+            Properties properties = new Properties(response.getPlace(), response.getLat(), response.getLon(), response.getCurrent().getTemp().toString(), Templates.globalWeatherCurrent(response).render());
+            Geometry geometry = new Geometry("point", coordinates);
+            Feature feature = new Feature(properties, geometry);
+            features.add(feature);
+            olatheResponse = response;
+            log.info("globeHourWeather() completed for lat:{}, lon:{}", lat, lon);
             return new GlobeResponse(olatheResponse.getPlace(), olatheResponse.getCurrent().getTemp().toString(), olatheResponse.getLat(), olatheResponse.getLon(), features);
         } catch (Exception ex) {
             log.error("exception:", ex);

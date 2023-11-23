@@ -19,4 +19,6 @@ public class Properties {
     private BigDecimal longitude;
     @JsonbProperty
     private String temperature;
+    @JsonbProperty
+    private String html;
 }

@@ -66,18 +66,18 @@
     .then(res1 => res1.json())
     .then(places => {
       let globe = Globe()
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+        .globeImageUrl('../../images/The_earth_at_night.jpg')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
         .labelsData(places.features)
         .labelLat(d => places.lat)
         .labelLng(d => places.lon)
         .labelText(d => places.city + "(" + places.temperature + ")")
-        .labelSize(d => .75)
-        .labelDotRadius(d => .5)
+        .labelSize(d => .2)
+        .labelDotRadius(d => .1)
         .labelColor(() => 'rgba(255, 165, 0, 0.75)')
         .labelResolution(2)
         (document.getElementById('globeViz'));
-      globe.pointOfView({ lat: places.lat, lng:places.lon, altitude: 1.5}, 5000);
+      globe.pointOfView({ lat: places.lat, lng:places.lon, altitude: .5}, 5000);
     })
     .catch(err => console.log(err));
   }
