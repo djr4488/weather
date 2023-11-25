@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -54,6 +55,16 @@ public class WeatherResource {
     }
 
     @GET
+    @Path("weather/full_LL/{lat}/{lon}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public TemplateInstance weatherFullLatLon(@PathParam("lat") final String lat, @PathParam("lon") final String lon) {
+        final OpenWeatherOneCallResponse response = weatherController.getWeatherFullByLatLon(lat, lon);
+        log.info("weatherFullLatLong() lat:{}, lon:{}, response:{}", lat, lon, response);
+        return Templates.weather(response);
+    }
+
+    @GET
     @Path("weather/full/{lat}/{lon}")
     @Produces(MediaType.APPLICATION_JSON)
     public OpenWeatherOneCallResponse weatherFull(@PathParam("lat") String lat, @PathParam("lon") String lon) {
@@ -70,10 +81,10 @@ public class WeatherResource {
         AudioResponse response = new AudioResponse();
         switch (id) {
             case 1:
-                response.setAudioSource("/audio/05 Local Forecast (Nighttime).mp3");
+                response.setAudioSource("/audio/05_Local_Forecast_(Nighttime).mp3");
                 break;
             case 2:
-                response.setAudioSource("/audio/07 Regional Forecast (Nighttime).mp3");
+                response.setAudioSource("/audio/07_Regional_Forecast_(Nighttime).mp3");
                 break;
             case 3:
                 response.setAudioSource("/audio/09_Global_Forecast_Nighttime.mp3");
@@ -185,5 +196,13 @@ public class WeatherResource {
             log.error("exception:", ex);
             return null;
         }
+    }
+
+    @Path("error/{error}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @POST
+    public void error(@PathParam("error") final String error) {
+        log.error("error() from client received error:{}", error);
     }
 }
