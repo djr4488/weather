@@ -4,8 +4,8 @@ import io.quarkus.scheduler.Scheduled;
 import org.djr4488.quarkus.controller.WeatherController;
 import org.slf4j.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 

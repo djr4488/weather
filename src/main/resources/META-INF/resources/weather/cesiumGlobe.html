@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <style>
+    #toolbar {
+      background: rgba(42, 42, 42, 0.8);
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    #toolbar input {
+      vertical-align: middle;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    #toolbar table tr {
+      transform: translateY(0);
+      transition: transform 0.4s ease-out;
+    }
+
+    #toolbar table tr.up {
+      transform: translateY(33px);
+      transition: none;
+    }
+
+    #toolbar table tr.down {
+      transform: translateY(-33px);
+      transition: none;
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<div class="container-fluid" id="weather-container">
+  <div class="row" id="weather-row-toolbar-map">
+    <div class="col" id="weather-col-toolbar">
+      <div id="toolbar">
+        <table>
+          <tbody data-bind="foreach: layers">
+          <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
+            <td><input type="checkbox" data-bind="checked: show"></td>
+            <td>
+              <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
+              <select data-bind="visible: $parent.isSelectableLayer($data), options: $parent.baseLayers, optionsText: 'name', value: $parent.selectedLayer"></select>
+            </td>
+            <td>
+              <input type="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'">
+            </td>
+            <td>
+              <button type="button" class="cesium-button" data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
+                ▲
+              </button>
+            </td>
+            <td>
+              <button type="button" class="cesium-button" data-bind="click: function() { $parent.lower($data, $index()); }, visible: $parent.canLower($index())">
+                ▼
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col" id="weather-col-map">
+      <div id="cesiumContainer" class="fullSize"></div>
+    </div>
+    <div class="row" id="the-weather-row">
+      <div class="col" id="weather-conditions-tab-panel-col">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjQ4MTdlYy0wNzY0LTRiMGEtOGFmMS1mN2MyZTg1Yzc4MDEiLCJpZCI6MTgyNzUxLCJpYXQiOjE3MDE4MzU4Mzh9.DYx5X5Zuys17C4L7vMQ46D2WLNuMYh9mCo5y66U6Dvk';
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      baseLayerPicker: false,
+    });
+    const scene = viewer.scene;
+    if (!scene.pickPositionSupported) {
+      window.alert("This browser does not support pickPosition.");
+    }
+    let handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    handler.setInputAction(function (movement) {
+      const cartesian = viewer.camera.position;
+      if (cartesian) {
+        const cartographic = Cesium.Cartographic.fromCartesian(
+                cartesian
+        );
+        const longitudeString = Cesium.Math.toDegrees(
+                cartographic.longitude
+        ).toFixed(8);
+        const latitudeString = Cesium.Math.toDegrees(
+                cartographic.latitude
+        ).toFixed(8);
+        const speedAltHeading = '/0/0/0';
+        fetch('/api/2.0/weather/full_LL/' + latitudeString + '/' + longitudeString + speedAltHeading, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        })
+        .then(res2 => res2.text())
+        .then(place => {
+          document.querySelector(
+                  '#weather-conditions-tab-panel-col'
+          ).innerHTML = place;
+        })
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    const imageryLayers = viewer.imageryLayers;
+
+    const viewModel = {
+      layers: [],
+      baseLayers: [],
+      upLayer: null,
+      downLayer: null,
+      selectedLayer: null,
+      isSelectableLayer: function (layer) {
+        return this.baseLayers.indexOf(layer) >= 0;
+      },
+      raise: function (layer, index) {
+        imageryLayers.raise(layer);
+        viewModel.upLayer = layer;
+        viewModel.downLayer = viewModel.layers[Math.max(0, index - 1)];
+        updateLayerList();
+        window.setTimeout(function () {
+          viewModel.upLayer = viewModel.downLayer = null;
+        }, 10);
+      },
+      lower: function (layer, index) {
+        imageryLayers.lower(layer);
+        viewModel.upLayer =
+                viewModel.layers[
+                        Math.min(viewModel.layers.length - 1, index + 1)
+                        ];
+        viewModel.downLayer = layer;
+        updateLayerList();
+        window.setTimeout(function () {
+          viewModel.upLayer = viewModel.downLayer = null;
+        }, 10);
+      },
+      canRaise: function (layerIndex) {
+        return layerIndex > 0;
+      },
+      canLower: function (layerIndex) {
+        return layerIndex >= 0 && layerIndex < imageryLayers.length - 1;
+      },
+    };
+    const baseLayers = viewModel.baseLayers;
+
+    Cesium.knockout.track(viewModel);
+
+    function setupLayers() {
+      // Create all the base layers that this example will support.
+      // These base layers aren't really special.  It's possible to have multiple of them
+      // enabled at once, just like the other layers, but it doesn't make much sense because
+      // all of these layers cover the entire globe and are opaque.
+      addBaseLayerOption(
+              "Bing Maps Road",
+              Cesium.createWorldImageryAsync({
+                style: Cesium.IonWorldImageryStyle.AERIAL_WITH_LABELS,
+              })
+      );
+      addBaseLayerOption(
+              "ArcGIS World Street Maps",
+              Cesium.ArcGisMapServerImageryProvider.fromUrl(
+                      "https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
+              )
+      );
+      addBaseLayerOption(
+              "OpenStreetMaps",
+              new Cesium.UrlTemplateImageryProvider({
+                url: "https://relativity.tplinkdns.com:9120/api/2.0/tracks/{s}/{x}/{y}/{z}",
+                credit: "OpenStreetMaps"
+              })
+      );
+      addBaseLayerOption(
+              "USGS Shaded Relief (via WMTS)",
+              new Cesium.WebMapTileServiceImageryProvider({
+                url:
+                        "https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/WMTS",
+                layer: "USGSShadedReliefOnly",
+                style: "default",
+                format: "image/jpeg",
+                tileMatrixSetID: "default028mm",
+                maximumLevel: 19,
+                credit: "U. S. Geological Survey",
+              })
+      );
+
+      // Create the additional layers
+      addAdditionalLayerOption(
+              "United States GOES Infrared",
+              new Cesium.WebMapServiceImageryProvider({
+                url:
+                        "https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?",
+                layers: "goes_conus_ir",
+                credit: "Infrared data courtesy Iowa Environmental Mesonet",
+                parameters: {
+                  transparent: "true",
+                  format: "image/png",
+                },
+              })
+      );
+      addAdditionalLayerOption(
+              "United States Weather Radar",
+              new Cesium.WebMapServiceImageryProvider({
+                url:
+                        "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?",
+                layers: "nexrad-n0r",
+                credit: "Radar data courtesy Iowa Environmental Mesonet",
+                parameters: {
+                  transparent: "true",
+                  format: "image/png",
+                },
+              })
+      );
+
+    }
+
+    async function addBaseLayerOption(name, imageryProviderPromise) {
+      try {
+        const imageryProvider = await Promise.resolve(
+                imageryProviderPromise
+        );
+
+        const layer = new Cesium.ImageryLayer(imageryProvider);
+        layer.name = name;
+        baseLayers.push(layer);
+        updateLayerList();
+      } catch (error) {
+        console.error(
+                `There was an error while creating ${name}. ${error}`
+        );
+      }
+    }
+
+    async function addAdditionalLayerOption(
+            name,
+            imageryProviderPromise,
+            alpha,
+            show
+    ) {
+      try {
+        const imageryProvider = await Promise.resolve(
+                imageryProviderPromise
+        );
+        const layer = new Cesium.ImageryLayer(imageryProvider);
+        layer.alpha = Cesium.defaultValue(alpha, 0.5);
+        layer.show = Cesium.defaultValue(show, true);
+        layer.name = name;
+        imageryLayers.add(layer);
+        Cesium.knockout.track(layer, ["alpha", "show", "name"]);
+        updateLayerList();
+      } catch (error) {
+        console.error(
+                `There was an error while creating ${name}. ${error}`
+        );
+      }
+    }
+
+    function updateLayerList() {
+      const numLayers = imageryLayers.length;
+      viewModel.layers.splice(0, viewModel.layers.length);
+      for (let i = numLayers - 1; i >= 0; --i) {
+        viewModel.layers.push(imageryLayers.get(i));
+      }
+    }
+
+    setupLayers();
+
+    //Bind the viewModel to the DOM elements of the UI that call for it.
+    const toolbar = document.getElementById("toolbar");
+    Cesium.knockout.applyBindings(viewModel, toolbar);
+
+    Cesium.knockout
+            .getObservable(viewModel, "selectedLayer")
+            .subscribe(function (baseLayer) {
+              // Handle changes to the drop-down base layer selector.
+              let activeLayerIndex = 0;
+              const numLayers = viewModel.layers.length;
+              for (let i = 0; i < numLayers; ++i) {
+                if (viewModel.isSelectableLayer(viewModel.layers[i])) {
+                  activeLayerIndex = i;
+                  break;
+                }
+              }
+              const activeLayer = viewModel.layers[activeLayerIndex];
+              const show = activeLayer.show;
+              const alpha = activeLayer.alpha;
+              imageryLayers.remove(activeLayer, false);
+              imageryLayers.add(baseLayer, numLayers - activeLayerIndex - 1);
+              baseLayer.show = show;
+              baseLayer.alpha = alpha;
+              updateLayerList();
+            });
+
+
+
+
+</script>
+</body>
+</html>
+

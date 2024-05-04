@@ -2,22 +2,34 @@ package org.djr4488.quarkus.controller;
 
 import org.djr4488.quarkus.model.geocode.OpenWeatherGeocodeResponse;
 import org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse;
+import org.djr4488.quarkus.model.rss.RssResponse;
+import org.djr4488.quarkus.model.store.Tile;
+import org.djr4488.quarkus.model.store.Track;
 import org.djr4488.quarkus.model.store.WeatherData;
 import org.djr4488.quarkus.model.store.WeatherLocation;
 import org.djr4488.quarkus.model.store.WeatherSearch;
 import org.djr4488.quarkus.services.OpenWeatherGeocodeClient;
 import org.djr4488.quarkus.services.OpenWeatherOneCallClient;
+import org.djr4488.quarkus.services.UsccbRssFeed;
 import org.djr4488.quarkus.services.database.DatabaseService;
 import org.djr4488.quarkus.utils.WeatherUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.json.bind.JsonbBuilder;
-import javax.transaction.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.transaction.Transactional;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -74,7 +86,8 @@ public class WeatherController {
         return response;
     }
 
-    public OpenWeatherOneCallResponse getWeatherFullByLatLon(String lat, String lon) {
+    public OpenWeatherOneCallResponse getWeatherFullByLatLon(String lat, String lon, String ipAddress, String altitude, String heading,
+                                                             String speed) {
         final LocalDateTime txTime = LocalDateTime.now();
         log.info("getWeatherFullByLatLon() lat:{}, lon:{}", lat, lon);
         WeatherLocation weatherLocation = databaseService.findWeatherLocationByLatLon(lat, lon);
@@ -95,6 +108,16 @@ public class WeatherController {
             weatherLocation.setLocationName(geocodeResponse.getName());
             databaseService.save(weatherLocation);
         }
+        Track track = new Track();
+        track.setLocalDateTime(LocalDateTime.now());
+        track.setIpAddress(ipAddress);
+        track.setLat(lat);
+        track.setLon(lon);
+        track.setAltitude(altitude);
+        track.setHeading(heading);
+        track.setSpeed(speed);
+        track.setWeatherLocation(weatherLocation);
+        databaseService.save(track);
         OpenWeatherOneCallResponse response = oneCallClient.getOneCallResponse(weatherLocation.getLat(), weatherLocation.getLon(), apiKey, "imperial");
         response.setPlace(weatherLocation.getLocationName());
         final LocalDateTime sunrise = response.getCurrent().getSunrise();
@@ -117,6 +140,47 @@ public class WeatherController {
             response = null;
         }
         return response;
+    }
+
+    public List<Track> getTracksForToday() {
+        return databaseService.findTracksSince(LocalDateTime.now().toLocalDate().atStartOfDay());
+    }
+
+    public byte[] getTileImageData(final String s, final Integer x, final Integer y, final Integer z) {
+        final Tile tile = databaseService.findTileBySXYZ(s, x, y, z);
+        final byte[] imageData;
+        if (tile == null) {
+            log.info("getTileImageData() tile s:{}, x:{}, y:{}, z:{} not found in database, retrieving from open street maps",
+                    s, x, y, z);
+            HttpClient client = HttpClient.newBuilder()
+                                          .version(HttpClient.Version.HTTP_2)
+                                          .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                                             .GET()
+                                             .uri(URI.create("http://" + s + ".tile.openstreetmap.org/" + z + "/" + x + "/" + y + ".png"))
+                                             .setHeader("User-Agent", "Java 17 Quarkus Weather App") // add request header
+                                             .header("Accept-Language", "en-US")
+                                             .header("Content-Type", "application/x-www-form-urlencoded")
+                                             .build();
+            try {
+                imageData = client.send(request, HttpResponse.BodyHandlers.ofByteArray()).body();
+                Tile toSave = new Tile();
+                toSave.setS(s);
+                toSave.setX(x);
+                toSave.setY(y);
+                toSave.setZ(z);
+                toSave.setImageData(imageData);
+                toSave.setLocalDateTime(LocalDateTime.now());
+                databaseService.save(toSave);
+            } catch (Exception ex) {
+                return null;
+            }
+        } else {
+            log.info("getTileImageData() tile s:{}, x:{}, y:{}, z:{}  found in database, returning tile:{}",
+                    tile.getId());
+            imageData = tile.getImageData();
+        }
+        return imageData;
     }
 
     public Set<String> loadDistinctWeatherLocations() {

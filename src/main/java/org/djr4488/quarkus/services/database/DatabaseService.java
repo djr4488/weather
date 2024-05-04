@@ -1,17 +1,20 @@
 package org.djr4488.quarkus.services.database;
 
 import org.apache.commons.lang3.StringUtils;
+import org.djr4488.quarkus.model.store.Tile;
+import org.djr4488.quarkus.model.store.Track;
 import org.djr4488.quarkus.model.store.WeatherData;
 import org.djr4488.quarkus.model.store.WeatherLocation;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -40,7 +43,7 @@ public class DatabaseService {
             if (StringUtils.trimToNull(location) != null) {
                 TypedQuery<WeatherData> query = em.createNamedQuery("findMostRecentWeatherDataForLocation", WeatherData.class);
                 query.setParameter("location", location);
-                query.setParameter("offsetDateTime", LocalDateTime.now().minusHours(2));
+                query.setParameter("offsetDateTime", LocalDateTime.now().toLocalDate().atStartOfDay());
                 return query.getSingleResult();
             } else {
                 return null;
@@ -65,6 +68,25 @@ public class DatabaseService {
         try {
             TypedQuery<String> query = em.createNamedQuery("findAllDistinctWeatherLocations", String.class);
             return new HashSet<String>(query.getResultList());
+        } catch (NoResultException nrEx) {
+            return null;
+        }
+    }
+
+    public List<Track> findTracksSince(final LocalDateTime localDateTime) {
+        TypedQuery<Track> query = em.createNamedQuery("findTracksSince", Track.class);
+        query.setParameter("localDateTime", localDateTime);
+        return query.getResultList();
+    }
+
+    public Tile findTileBySXYZ(final String s, final Integer x, final Integer y, final Integer z) {
+        try {
+            TypedQuery<Tile> query = em.createNamedQuery("findTileBySXYZ", Tile.class);
+            query.setParameter("s", s);
+            query.setParameter("x", x);
+            query.setParameter("y", y);
+            query.setParameter("z", z);
+            return query.getSingleResult();
         } catch (NoResultException nrEx) {
             return null;
         }

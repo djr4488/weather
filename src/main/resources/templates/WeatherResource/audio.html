@@ -9,10 +9,19 @@
         </audio>
     </div>
     <div class="col">
-        <h3>Play List</h3>
-        <button class="btn btn-link" type="submit" id="audioTrack1" value="1" onclick="getAudio(1)">Play Track 1</button>
-        <button class="btn btn-link" type="submit" id="audioTrack2" value="2" onclick="getAudio(2)">Play Track 2</button>
-        <button class="btn btn-link" type="submit" id="audioTrack3" value="3" onclick="getAudio(3)">Play Track 3</button>
-        <button class="btn btn-link" type="submit" id="audioTrack4" value="4" onclick="getAudio(4)">Play Track 4</button>
+        <h3>Select Track</h3>
+        <select id="selectTractSelectOneMenu" class="form-select" aria-label="Select Track" onchange="getAudio()">
+            <option value="1">05 Local Forecast Nighttime</option>
+            <option value="2" >07 Regional Forecast Nighttime</option>
+            <option value="3">09 Global Forecast Nighttime</option>
+            <option value="4">11 Global Forecast Nighttime Layer Only</option>
+            <option value="6">00 Namco Museum</option>
+            <option value="7">02 Downloading the Latest News</option>
+            <option value="8">05 News Slideshow Nighttime</option>
+            <option value="9">06 Global News View</option>
+            <option value="10">07 Global News Layer Only</option>
+            <option value="11">Legend of Mana</option>
+            <option value="12">Chrono Cross</option>
+        </select>
     </div>
 </div>

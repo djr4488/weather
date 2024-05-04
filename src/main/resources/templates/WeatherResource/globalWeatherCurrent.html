@@ -1,20 +1,222 @@
 {@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse globalWeatherCurrent}
-<div class="row">
-    <div class="row">
-        <div id="current-conditions" class="col">
-            <div class="row">
-                <div id="current-location" class="col">{globalWeatherCurrent.place}</div>
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-currently" type="button" role="tab" aria-controls="pills-currently" aria-selected="true">Current Conditions</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-alerts" type="button" role="tab" aria-controls="pills-alerts" aria-selected="false">Current Active Alerts</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-hourly" type="button" role="tab" aria-controls="pills-hourly" aria-selected="false">Hourly Forecast</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-disabled-tab" data-bs-toggle="pill" data-bs-target="#pills-fiveday" type="button" role="tab" aria-controls="pills-fiveday" aria-selected="false">3 Day Outlook</button>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-currently" role="tabpanel" aria-labelledby="pills-currently-tab" tabindex="0">
+        <div class="row" id="current-conditions-row">
+            <div class="col" id="current-conditions-place-col">
+                <div class="row" id="current-conditions-place-temp-row">
+                    <div class="col" id="current-conditions-place-temp-col">
+                        <h8 id="current-location">Currently for {globalWeatherCurrent.place} the temperature is {globalWeatherCurrent.current.temp}</h8>
+                    </div>
+                </div>
+                <div class="row" id="current-conditions-image-row">
+                    <div class="col" id="current-conditions-image-col">
+                        <img src="../../images/{globalWeatherCurrent.current.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/>
+                    </div>
+                    <div class="col" id="cur_temps">
+                        <div class="row">
+                            <div class="col" id="cur_temp"><h8>{globalWeatherCurrent.current.temp}</h8></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="cur_LHFL">L:{globalWeatherCurrent.daily[0].temp.min} | H:{globalWeatherCurrent.daily[0].temp.max} | FL:{globalWeatherCurrent.current.feelsLike}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="cur_precip_falling">{} | {}
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="current-conditions-dt-row">
+                    <div class="col" id="current-conditions-column">
+                        <div class="row">
+                            <div class="col" id="current_sun"><h8>Sunrise and Sunset</h8></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><img src="../../images/sunrise.svg" alt="..." height="32px" width="32px"/> {time:format(globalWeatherCurrent.current.sunrise, 'hh:mm:ss a')}</div>
+                            <div class="col"><img src="../../images/sunset.svg" alt="..." height="32px" width="32px"/> {time:format(globalWeatherCurrent.current.sunset, 'hh:mm:ss a')}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><h8>Pressure</h8></div>
+                            <div class="col"><h8>Humidity</h8></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="current-pressure-data">{globalWeatherCurrent.current.pressure}</div>
+                            <div class="col" id="current-humidity-data">{globalWeatherCurrent.current.humidity}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><h8>Wind</h8></div>
+                            <div class="col"><h8>UV Index</h8></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="current-wind"><img src="../../images/compass.svg" alt="Wind Direction {globalWeatherCurrent.current.windDeg}" style="transform:rotate({globalWeatherCurrent.current.getOffsetWindDeg()}deg);" height="32px" width="32px"/> At {globalWeatherCurrent.current.windSpeed} mph {#if globalWeatherCurrent.current.windGust != null}gusts to {globalWeatherCurrent.current.windGust} mph{/if}</div>
+                            <div class="col" id="current-uv-index">{globalWeatherCurrent.current.uvi}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><h8>Weather Description</h8></div>
+                            <div class="col"><h8>Precipitation Chance Today</h8></div>
+                        </div>
+                        <div class="row">
+                            <div class="col" id="current-weather-description">{globalWeatherCurrent.current.weather[0].description}</div>
+                            <div class="col" id="precipitation-chance-today">{globalWeatherCurrent.daily[0].probabilityOfPrecipitation}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="row">
-                <div id="current-conditions-image" class="col"><img src="../../images/{globalWeatherCurrent.current.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/></div>
+            <div class="col" id="current-short-conditions-alerts-col">
+                {#if globalWeatherCurrent.getAlertSize() > 0}
+                <div class="col" id="alertView">
+                {#for alert in globalWeatherCurrent.alerts}
+                    {#if alert.event.contains("Warning")}
+                    <div class="alert alert-danger" role="alert">
+                        {#else}
+                        <div class="alert alert-warning" role="alert">
+                            {/if}
+                            <h8 class="alert-heading">{alert.senderName}</h8>
+                            <p>{alert.event}</p>
+                            <p class="mb-0">Start: {time:format(alert.start, 'MM-dd-yyyy hh:mm a')} End: {time:format(alert.end, 'MM-dd-yyyy hh:mm a')}</p>
+                            <hr>
+                            <p class="mb-0">{alert.tags}</p>
+                        </div>
+                        {/for}
+                    </div>
+                    {/if}
             </div>
-            <div class="row">
-                <div class="col" id="cur_temp"><h6>{globalWeatherCurrent.current.temp}</h6></div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="pills-alerts" role="tabpanel" aria-labelledby="pills-alerts-tab" tabindex="0">
+        {#if globalWeatherCurrent.getAlertSize() > 0}
+        <div class="row" id="active-alerts-row">
+            <div class="col" id="alertView">
+            {#for alert in globalWeatherCurrent.alerts}
+            {#if alert.event.contains("Warning")}
+                <div class="alert alert-danger" role="alert">
+                    {#else}
+                    <div class="alert alert-warning" role="alert">
+                        {/if}
+                        <h4 class="alert-heading">{alert.senderName}</h4>
+                        <p>{alert.event}</p>
+                        <p class="mb-0">Start: {time:format(alert.start, 'MM-dd-yyyy hh:mm a')} End: {time:format(alert.end, 'MM-dd-yyyy hh:mm a')}</p>
+                        <hr>
+                        <p class="mb-0">{alert.description}</p>
+                    </div>
+                    {/for}
             </div>
-            <div class="row">
-                <div class="col" id="cur_LHFL">L:{globalWeatherCurrent.daily[0].temp.min} | H:{globalWeatherCurrent.daily[0].temp.max} | FL:{globalWeatherCurrent.current.feelsLike}</div>
-            </div>
-            </div>
+        </div>
+        {/if}
+    </div>
+    <div class="tab-pane fade" id="pills-hourly" role="tabpanel" aria-labelledby="pills-hourly-tab" tabindex="0">
+        <div class="row" id="hourly-images-row">
+        {#each globalWeatherCurrent.hourly}
+            {#if it_index < 4}
+                <div id="hourly{it_count}Img" class="col"><img src="../../images/{it.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/></div>
+            {/if}
+        {/each}
+        </div>
+        <div class="row" id="hourly-conditions-row">
+        {#each globalWeatherCurrent.hourly}
+            {#if it_index < 4}
+                <div id="hourly{it_index}Col" class="col">
+                    <div class="hourly{it_index}HourStamp">{it.dt.toLocalDate()}, {time:format(it.dt, 'hh:mm a')}</div>
+                    <div class="hourly{it_index}Temp">Temp: {it.temp}</div>
+                    <div class="hourly{it_index}POP">Precipitation Probability: {it.probabilityOfPrecipitation}</div>
+                    <div class="hourly{it_index}Uvi">UV Index: {it.uvi}</div>
+                    <div class="hourly{it_index}Wind">Wind: <img src="../../images/compass.svg" alt="Wind Direction {it.windDeg}" style="transform:rotate({it.getOffsetWindDeg()}deg);" height="32px" width="32px"/> At {it.windSpeed} mph {#if it.windGust != null}gusts to {it.windGust} mph{/if}</div>
+                    <div class="hourly{it_index}Weather">Weather Description: {it.weather[0].description}</div>
+                </div>
+            {/if}
+        {/each}
+        </div>
+    </div>
+    <div class="tab-pane fade" id="pills-fiveday" role="tabpanel" aria-labelledby="pills-fiveday-tab" tabindex="0">
+        <div class="row" id="five-day-outlook-forecasts">
+            {#each globalWeatherCurrent.daily}
+                {#if it_index >= 1 && it_index <= 3}
+                    <div class="col">
+                        <div class="row border">
+                            <div class="col">{it.getDayOfWeek()} {it.dt.toLocalDate()}</div>
+                        </div>
+                        <div class="row border">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col text-center"><h8>Sunrise and Sunset</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col"><img src="../../images/sunrise.svg" alt="Sunrise: " height="32px" width="32px"/> {time:format(it.sunrise, 'hh:mm:ss a')}</div>
+                                    <div class="col"><img src="../../images/sunset.svg" alt="Sunset: " height="32px" width="32px"/> {time:format(it.sunset, 'hh:mm:ss a')}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col text-center"><h8>Moonrise and Moonset</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col"><img src="../../images/moonrise.svg" alt="Moonrise: " height="32px" width="32px"/> {time:format(it.moonrise, 'hh:mm:ss a')}</div>
+                                    <div class="col"><img src="../../images/moonset.svg" alt="Moonset:" height="32px" width="32px"/> {time:format(it.moonset, 'hh:mm:ss a')}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center"><h8>Moonphase</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col"><img src='../../images/{it.getMoonPhaseImage()}' alt='${it.getMoonPhaseValue()}' width="32px" height="'32px"/>{it.getMoonPhaseValue()}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col text-center"><h8>Temps.</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center"><h8>Low</h8></div>
+                                    <div class="col text-center"><h8>High</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">{it.temp.min}</div>
+                                    <div class="col text-center">{it.temp.max}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col text-center"><h8>Precipitation Chance</h8></div>
+                                    <div class="col text-center"><h8>Wind</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">{it.probabilityOfPrecipitation}</div>
+                                    <div class="col text-center"><img src="../../images/compass.svg" alt="Wind Direction {it.windDeg}" style="transform:rotate({it.getOffsetWindDeg()}deg);" height="32px" width="32px"/> At {it.windSpeed} mph {#if it.windGust != null}gusts to {it.windGust} mph{/if}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border">
+                            <div class="col">
+                                <div class="row ">
+                                    <div class="col text-center"><h8>UV Index</h8></div>
+                                    <div class="col text-center"><h8>Weather</h8></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">{it.uvi}</div>
+                                    <div class="col text-center">{it.weather[0].description}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+            {/each}
         </div>
     </div>
 </div>

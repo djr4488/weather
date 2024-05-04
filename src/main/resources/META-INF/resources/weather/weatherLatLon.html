@@ -34,8 +34,10 @@
 </div>
 </body>
 <script>
-    getAudio(1);
+    getAudio();
     document.addEventListener("submit", sendData);
+    sendData(null);
+    let intervalRunner = setInterval(sendData, 1000*60*5);
     function errorPositionCheck(error) {
         console.log(error);
         fetch("/api/2.0/error/" + error.message,
@@ -48,7 +50,8 @@
     }
 
     function fetchWeather(e) {
-        fetch("/api/2.0/weather/full_LL/" + e.coords.latitude + "/" + e.coords.longitude, {
+        let geo = e.coords;
+        fetch("/api/2.0/weather/full_LL/" + geo.latitude + "/" + geo.longitude + "/" + geo.altitude + "/" + geo.heading + "/" + geo.speed,  {
             method: "GET",
             headers: {
                 "Accept": "application/json"
@@ -64,11 +67,20 @@
     }
 
     function sendData(e) {
-        e.preventDefault();
+        if (e != null) {
+            e.preventDefault();
+        }
         navigator.geolocation.getCurrentPosition(fetchWeather, errorPositionCheck);
     }
 
-    function getAudio(track) {
+    function getAudio() {
+        var track;
+        try {
+            track = document.getElementById("selectTractSelectOneMenu").value;
+            document.getElementById('selectTractSelectOneMenu').value = track;
+        } catch (TypeError) {
+            track = 1;
+        }
         fetch("/api/2.0/audio/" + track, {
             method: "GET",
             headers: {
@@ -79,6 +91,7 @@
             .then(data => {
                 document.querySelector('#audioControlCol')
                     .innerHTML = data;
+                document.getElementById('selectTractSelectOneMenu').value = track;
             })
             .catch(err => {
                 console.log(err);

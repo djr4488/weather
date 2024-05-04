@@ -1,0 +1,39 @@
+{@org.djr4488.quarkus.model.rss.RssResponse dailyReadings}
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    {#each dailyReadings.channel.item}
+    <li class="nav-item" role="presentation">
+        {#if it_index == 0}
+        <button class="nav-link active" id="pills-reading-{it_index}-tab" data-bs-toggle="pill" data-bs-target="#pills-reading-{it_index}" type="button" role="tab" aria-controls="pills-reading-{it_index}" aria-selected="true">{it.pubDateToLocalDate()}</button>
+        {#else}
+        <button class="nav-link" id="pills-reading-{it_index}-tab" data-bs-toggle="pill" data-bs-target="#pills-reading-{it_index}" type="button" role="tab" aria-controls="pills-reading-{it_index}" aria-selected="false">{it.pubDateToLocalDate()}</button>
+        {/if}
+    </li>
+    {/each}
+</ul>
+<div id="dailyReadingsRowReadings" class="row">
+    <div id="dailyReadingsColReadings" class="col">
+        <div class="tab-content" id="pills-tabContent">
+            {#each dailyReadings.channel.item}
+            {#if it_index == 0}
+            <div class="tab-pane fade show active" id="pills-reading-{it_index}" role="tabpanel" aria-labelledby="pills-reading-{it_index}-tab" tabindex="{it_index}">
+            {#else}
+            <div class="tab-pane fade" id="pills-reading-{it_index}" role="tabpanel" aria-labelledby="pills-reading-{it_index}-tab" tabindex="{it_index}">
+            {/if}
+                <div class="row" id="readingsDay-{it_index}-row">
+                    <div class="col" id="readingsDay-{it_index}-col">
+                         <h5>Daily Readings for {it.pubDateToLocalDate()}</h5>
+                    </div>
+                </div>
+                <hr />
+                <div class="row" id="readings-{it_index}-row">
+                    <div class="col" id="readings-{it_index}-col">
+                        {it.description.raw}
+                     </div>
+                </div>
+            </div>
+            {/each}
+        </div>
+    </div>
+</div>
+<hr />
+

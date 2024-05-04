@@ -1,6 +1,6 @@
 package org.djr4488.quarkus.model.adapters;
 
-import javax.json.bind.adapter.JsonbAdapter;
+import jakarta.json.bind.adapter.JsonbAdapter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 

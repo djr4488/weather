@@ -1,0 +1,206 @@
+{@org.djr4488.quarkus.model.rss.RssResponse catholicNews}
+<div class="row" id="pageHeadingRow">
+    <div class="col" id="pageHeadingCol">
+        <header>Catholic News Headlines</header>
+    </div>
+</div>
+<div class="row" id="page-row-sotd-section">
+    <div class="col-5" id="page-col-sotd-title-section">
+        <div class="card" id="saint-of-the-day-card">
+            <div class="card-header" id="saint-of-the-day-card-header">
+                Saint of the day {catholicNews.sotd().title}
+            </div>
+            <div class="card-body" id="saint-of-the-day-card-body">
+                {catholicNews.sotd().description.raw}
+            </div>
+        </div>
+    </div>
+    <div class="col-7" id="page-col-news-section">
+        <div class="accordion" id="accordionVaticanSection">
+            <div class="accordion-item" id="accordionVaticanSectionItem">
+                <h2 id="accordionVaticanSectionHeader" class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordionVaticanSectionCollapse" aria-expanded="false" aria-controls="accordionVaticanSectionCollapse">
+                        Vatican News
+                    </button>
+                </h2>
+                <div id="accordionVaticanSectionCollapse" class="accordion-collapse collapse" aria-labelledby="accordionVaticanSectionHeader" data-bs-parent="#accordionVaticanSection">
+                    <div id="accordionVaticanSectionBody" class="accordion-body">
+                    {#each catholicNews.channel.item}
+                        <div id="accordionInnerVaticanArticles" class="accordion">
+                            {#if it.category == 'Vatican'}
+                            <div id="accordionItem-{it_index}-category-vatican">
+                                <h2 id="accordionHeader-{it_index}-vatican" class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{it_index}-vatican" aria-expanded="false" aria-controls="collapse-{it_index}-vatican">
+                                        {it.title} - {it.category} - {it.pubDateToLocalDate()}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{it_index}-vatican" class="accordion-collapse collapse" aria-labelledby="accordionHeader-{it_index}-vatican" data-bs-parent="#accordionInnerVaticanArticles">
+                                    <div class="accordion-body">
+                                        {it.description.raw}
+                                    </div>
+                                </div>
+                            </div>
+                            {/if}
+                        </div>
+                    {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" id="accordionUSSection">
+            <div class="accordion-item" id="accordionUSSectionItem">
+                <h2 id="accordionUSSectionHeader" class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordionUSSectionCollapse" aria-expanded="false" aria-controls="accordionUSSectionCollapse">
+                        US News
+                    </button>
+                </h2>
+                <div id="accordionUSSectionCollapse" class="accordion-collapse collapse" aria-labelledby="accordionUSSectionHeader" data-bs-parent="#accordionUSSection">
+                    <div id="accordionUSSectionBody" class="accordion-body">
+                        {#each catholicNews.channel.item}
+                            <div id="accordionInnerUSArticles" class="accordion">
+                            {#if it.category == 'US'}
+                                <div id="accordionItem-{it_index}-category-us">
+                                <h2 id="accordionHeader-{it_index}-us" class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{it_index}-us" aria-expanded="false" aria-controls="collapse-{it_index}-us">
+                                        {it.title} - {it.category} - {it.pubDateToLocalDate()}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{it_index}-us" class="accordion-collapse collapse" aria-labelledby="accordionHeader-{it_index}-us" data-bs-parent="#accordionInnerUSArticles">
+                                <div class="accordion-body">
+                                {it.description.raw}
+                                </div>
+                                </div>
+                                </div>
+                            {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" id="accordionAmericasSection">
+            <div class="accordion-item" id="accordionAmericasSectionItem">
+                <h2 id="accordionAmericasSectionHeader" class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordionAmericasSectionCollapse" aria-expanded="false" aria-controls="accordionAmericasSectionCollapse">
+                        Americas News
+                    </button>
+                </h2>
+                <div id="accordionAmericasSectionCollapse" class="accordion-collapse collapse" aria-labelledby="accordionAmericasSectionHeader" data-bs-parent="#accordionAmericasSection">
+                    <div id="accordionAmericasSectionBody" class="accordion-body">
+                        {#each catholicNews.channel.item}
+                            <div id="accordionInnerAmericasArticles" class="accordion">
+                            {#if it.category == 'Americas'}
+                                <div id="accordionItem-{it_index}-category-americas">
+                                <h2 id="accordionHeader-{it_index}-americas" class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{it_index}-americas" aria-expanded="false" aria-controls="collapse-{it_index}-americas">
+                                        {it.title} - {it.category} - {it.pubDateToLocalDate()}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{it_index}-americas" class="accordion-collapse collapse" aria-labelledby="accordionHeader-{it_index}-americas" data-bs-parent="#accordionInnerAmericasArticles">
+                                <div class="accordion-body">
+                                {it.description.raw}
+                                </div>
+                                </div>
+                                </div>
+                            {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" id="accordionEuropeSection">
+            <div class="accordion-item" id="accordionEuropeSectionItem">
+                <h2 id="accordionEuropeSectionHeader" class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordionEuropeSectionCollapse" aria-expanded="false" aria-controls="accordionEuropeSectionCollapse">
+                        Europe News
+                    </button>
+                </h2>
+                <div id="accordionEuropeSectionCollapse" class="accordion-collapse collapse" aria-labelledby="accordionEuropeSectionHeader" data-bs-parent="#accordionEuropeSection">
+                    <div id="accordionEuropeSectionBody" class="accordion-body">
+                        {#each catholicNews.channel.item}
+                            <div id="accordionInnerEuropeArticles" class="accordion">
+                            {#if it.category == 'Europe'}
+                                <div id="accordionItem-{it_index}-category-europe">
+                                <h2 id="accordionHeader-{it_index}-europe" class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{it_index}-europe" aria-expanded="false" aria-controls="collapse-{it_index}-europe">
+                                        {it.title} - {it.category} - {it.pubDateToLocalDate()}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{it_index}-europe" class="accordion-collapse collapse" aria-labelledby="accordionHeader-{it_index}-europe" data-bs-parent="#accordionInnerEuropeArticles">
+                                <div class="accordion-body">
+                                {it.description.raw}
+                                </div>
+                                </div>
+                                </div>
+                            {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" id="accordionAsiaPacificSection">
+            <div class="accordion-item" id="accordionVaticanSectionItem">
+                <h2 id="accordionAsiaPacificSectionHeader" class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordionAsiaPacificSectionCollapse" aria-expanded="false" aria-controls="accordionAsiaPacificSectionCollapse">
+                        Asia - Pacific News
+                    </button>
+                </h2>
+                <div id="accordionAsiaPacificSectionCollapse" class="accordion-collapse collapse" aria-labelledby="accordionAsiaPacificSectionHeader" data-bs-parent="#accordionAsiaPacificSection">
+                    <div id="accordionAsiaPacificSectionBody" class="accordion-body">
+                        {#each catholicNews.channel.item}
+                            <div id="accordionInnerAsiaPacificArticles" class="accordion">
+                            {#if it.category == 'Asia - Pacific'}
+                                <div id="accordionItem-{it_index}-category-asiapacific">
+                                <h2 id="accordionHeader-{it_index}-asiapacific" class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{it_index}-asiapacific" aria-expanded="false" aria-controls="collapse-{it_index}-asiapacific">
+                                        {it.title} - {it.category} - {it.pubDateToLocalDate()}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{it_index}-asiapacific" class="accordion-collapse collapse" aria-labelledby="accordionHeader-{it_index}-asiapacific" data-bs-parent="#accordionInnerAsiaPacificArticles">
+                                <div class="accordion-body">
+                                {it.description.raw}
+                                </div>
+                                </div>
+                                </div>
+                            {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion" id="accordionMiddleEastAfricaSection">
+            <div class="accordion-item" id="accordionVaticanSectionItem">
+                <h2 id="accordionMiddleEastAfricaSectionHeader" class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordionMiddleEastAfricaSectionCollapse" aria-expanded="false" aria-controls="accordionMiddleEastAfricaSectionCollapse">
+                        Middle East - Africa News
+                    </button>
+                </h2>
+                <div id="accordionMiddleEastAfricaSectionCollapse" class="accordion-collapse collapse" aria-labelledby="accordionMiddleEastAfricaSectionHeader" data-bs-parent="#accordionMiddleEastAfricaSection">
+                    <div id="accordionMiddleEastAfricaSectionBody" class="accordion-body">
+                        {#each catholicNews.channel.item}
+                            <div id="accordionInnerMiddleEastAfricaArticles" class="accordion">
+                            {#if it.category == 'Middle East - Africa'}
+                                <div id="accordionItem-{it_index}-category-middle-east-africa">
+                                <h2 id="accordionHeader-{it_index}-middle-east-africa" class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{it_index}-middle-east-africa" aria-expanded="false" aria-controls="collapse-{it_index}-middle-east-africa">
+                                        {it.title} - {it.category} - {it.pubDateToLocalDate()}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{it_index}-middle-east-africa" class="accordion-collapse collapse" aria-labelledby="accordionHeader-{it_index}-middle-east-africa" data-bs-parent="#accordionInnerMiddleEastAfricaArticles">
+                                <div class="accordion-body">
+                                {it.description.raw}
+                                </div>
+                                </div>
+                                </div>
+                            {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -8,8 +8,8 @@ import org.djr4488.quarkus.controller.WeatherController;
 import org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse;
 import org.slf4j.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class WeatherEndpoint { // extends RouteBuilder {
