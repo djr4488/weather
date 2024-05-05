@@ -1,0 +1,99 @@
+{@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse weather}
+<div class="row" id="five-day-outlook-forecasts">
+    {#each weather.daily}
+        {#if it_index >= 1 && it_index <= 3}
+            <div class="col">
+            <div class="row border">
+                <div class="col-3" id="daily-image">
+                    <img src="../../images/{it.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/>
+                </div>
+                <div id="daily{it_index}ColTemps" class="col-3 mt-3">
+                    <div id="daily{it_index}RowHigh" class="row">
+                        <div id="daily{it_index}ColHigh" class="col">
+                            <figure class="text-sm-center">
+                                <span class="align-content-sm-center">{it.temp.max.toBigInteger()}</span>
+                            </figure>
+                        </div>
+                    </div>
+                    <hr class="mt-0" />
+                    <div id="daily{it_index}RowLow" class="row">
+                        <div id="daily{it_index}ColLow" class="col">
+                            <figure class="text-sm-center">
+                                <span class="align-content-sm-center">{it.temp.min.toBigInteger()}</span>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row border">
+                <div class="col">{it.getDayOfWeek()} {it.dt.toLocalDate()}</div>
+            </div>
+            <div class="row border">
+                <div class="col">
+                    <div class="row">
+                        <div class="col text-center"><h8>Sunrise and Sunset</h8></div>
+                    </div>
+                    <div class="row">
+                        <div class="col"><img src="../../images/sunrise.svg" alt="Sunrise: " height="32px" width="32px"/> {time:format(it.sunrise, 'hh:mm:ss a')}</div>
+                        <div class="col"><img src="../../images/sunset.svg" alt="Sunset: " height="32px" width="32px"/> {time:format(it.sunset, 'hh:mm:ss a')}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row border">
+                <div class="col">
+                    <div class="row">
+                        <div class="col text-center"><h8>Moonrise and Moonset</h8></div>
+                    </div>
+                    <div class="row">
+                        <div class="col"><img src="../../images/moonrise.svg" alt="Moonrise: " height="32px" width="32px"/> {time:format(it.moonrise, 'hh:mm:ss a')}</div>
+                        <div class="col"><img src="../../images/moonset.svg" alt="Moonset:" height="32px" width="32px"/> {time:format(it.moonset, 'hh:mm:ss a')}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center"><h8>Moonphase</h8></div>
+                    </div>
+                    <div class="row">
+                        <div class="col"><img src='../../images/{it.getMoonPhaseImage()}' alt='${it.getMoonPhaseValue()}' width="32px" height="'32px"/>{it.getMoonPhaseValue()}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row border">
+                <div class="col">
+                    <div class="row">
+                        <div class="col text-center"><h8>Precipitation Chance</h8></div>
+                        <div class="col text-center"><h8>Wind</h8></div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center">{it.probabilityOfPrecipitation}</div>
+                        <div class="col text-center"><img src="../../images/compass.svg" alt="Wind Direction {it.windDeg}" style="transform:rotate({it.getOffsetWindDeg()}deg);" height="32px" width="32px"/> At {it.windSpeed.toBigInteger()} mph {#if it.windGust != null}gusts to {it.windGust.toBigInteger()} mph{/if}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row border">
+                <div class="col">
+                    <div class="row ">
+                        <div class="col text-center"><h8>UV Index</h8></div>
+                        <div class="col text-center"><h8>Weather</h8></div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center">{it.uvi}</div>
+                        <div class="col text-center">{it.weather[0].description}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row border">
+            <div class="col">
+            <div class="row">
+            <div class="col">
+            <figure class="text-end">
+            <blockquote class="blockquote">
+            <p>{it.summary}</p>
+            </blockquote>
+            </figure>
+            </div>
+            </div>
+            </div>
+            </div>
+            </div>
+        {/if}
+    {/each}
+</div>

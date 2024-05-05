@@ -1,0 +1,204 @@
+{@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse weather}
+  <div class="row" id="current-conditions-row">
+    <div class="col-12" id="current-conditions-col">
+        <div class="row border" id="current-conditions-location">
+            <figure class="text-sm-left">
+                <blockquote class="blockquote">Current conditions for {weather.place}.</blockquote>
+            </figure>
+        </div>
+        {#if weather.getAlertSize() > 0}
+        <div class="row border" id="current-conditions-short-alerts-row">
+            <div class="col" id="current-condtions-short-alert-view">
+                {#for alert in weather.alerts}
+                {#if alert.event.contains("Warning")}
+                <div class="alert alert-danger" role="alert">
+                    {#else}
+                    <div class="alert alert-warning" role="alert">
+                        {/if}
+                        <h8 class="alert-heading">{alert.senderName}</h8>
+                        <p>{alert.event}</p>
+                        <p class="mb-0">Start: {time:format(alert.start, 'MM-dd-yyyy hh:mm a')} End: {time:format(alert.end, 'MM-dd-yyyy hh:mm a')}</p>
+                        <hr>
+                        <p class="mb-0">{alert.tags}</p>
+                    </div>
+                    {/for}
+                </div>
+            </div>
+            {/if}
+            <div class="row border" id="current-conditions-img-temps">
+                <div class="col-2" id="current-conditions-img-col">
+                    <img src="../../images/{weather.current.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/>
+                </div>
+                <div id="current-conditions-temp-col" class="col-2 mt-3">
+                    <figure class="text-center">
+                        <blockquote class="blockquote">
+                            {weather.current.temp.toBigInteger()}
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            Feels like {weather.current.feelsLike.toBigInteger()}
+                        </figcaption>
+                    </figure>
+                </div>
+                <div id="current-conditions-wind-gust-compass-precip" class="col-8 mt-3">
+                    <div id="current-conditions-wind-compass-row" class="row">
+                        <div id="current-conditions-wind-compass-col" class="col-1">
+                            <img src="../../images/compass.svg" alt="Wind Direction {weather.current.windDeg}" style="transform:rotate({weather.current.getOffsetWindDeg()}deg);" height="64px" width="64px"/>
+                        </div>
+                        <div id="current-conditions-wind-gusts-col" class="col-6">
+                            <figure class="text-sm-left">
+                                <blockquote class="blockquote">
+                                    {weather.current.windSpeed.toBigInteger()} {#if weather.current.windGust != null} / {weather.current.windGust.toBigInteger()}{/if}
+                                </blockquote>
+                                <blockquote class="blockquote-footer">
+                                    Wind & Gusts MPH
+                                </blockquote>
+                            </figure>
+                        </div>
+                        <div id="current-conditions-precip" class="col-5">
+                            <div id="current-conditions-precip-img" class="row">
+                                <div id="current-conditions-precip-img-col" class="col-3">
+                                    {#if weather.daily[0].rain != null} <img src="../../images/rain.svg" class="img-thumbnail" height="48px" width="48px" /> {#else if weather.daily[0].snow != null} <img src="../../images/snowman.svg" class="img-thumbnail" height="48px" width="48px" /> {/if}
+                                </div>
+                                <div id="current-conditions-precip-data-col" class="col-9">
+                                    <figure class="text-sm-left">
+                                        <figcaption class="blockquote">
+                                            {weather.hourly[0].probabilityOfPrecipitation.movePointRight(2)} / {weather.daily[0].precipInches}"
+                                        </figcaption>
+                                        <blockquote class="blockquote-footer">
+                                            precip. % next hr / precip. inches today
+                                        </blockquote>
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row border" id="current-condtions-pressure-humidity-highlow-uv-description">
+                <div id="current-conditions-temps-col" class="col-2 mt-3">
+                    <div id="current-conditions-temp-high-row" class="row">
+                        <div id="current-conditions-temp-high-col" class="col">
+                            <figure class="text-sm-center">
+                                <span class="align-content-sm-center">{weather.daily[0].temp.max.toBigInteger()}</span>
+                            </figure>
+                        </div>
+                    </div>
+                    <hr class="mt-0" />
+                    <div id="current-conditions-temp-low-row" class="row">
+                        <div id="current-conditions-temp-low-col" class="col">
+                            <figure class="text-sm-center">
+                                <span class="align-content-sm-center">{weather.daily[0].temp.min.toBigInteger()}</span>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+                <div id="current-conditions-uv" class="col-2 mt-3">
+                    <figure class="text-sm-center">
+                        <blockquote class="blockquote">
+                            {weather.current.uvi}
+                        </blockquote>
+                        <blockquote class="blockquote-footer">
+                            UV Index
+                        </blockquote>
+                    </figure>
+                </div>
+                <div id="current-conditions-pressure" class="col-2 mt-3">
+                    <figure class="text-sm-center">
+                        <blockquote class="blockquote">
+                            {weather.current.pressure}
+                        </blockquote>
+                        <blockquote class="blockquote-footer">
+                            Pressure
+                        </blockquote>
+                    </figure>
+                </div>
+                <div id="current-conditions-humidity" class="col-2 mt-3">
+                    <figure class="text-sm-center">
+                        <blockquote class="blockquote">
+                            {weather.current.humidity}
+                        </blockquote>
+                        <blockquote class="blockquote-footer">
+                            Humidity
+                        </blockquote>
+                    </figure>
+                </div>
+                <div id="current-conditions-description" class="col-4 mt-3">
+                    <figure class="text-sm-center">
+                        <blockquote class="blockquote">
+                            {weather.current.weather[0].description}
+                        </blockquote>
+                        <blockquote class="blockquote-footer">
+                            Short description
+                        </blockquote>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="row border" id="current-condtions-summary-row">
+                <div class="col" id="current-conditions-summary-col">
+                    <figure class="text-middle">
+                        <blockquote class="blockquote">
+                            <p>{weather.daily[0].summary}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            Weather summary for today
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="row border" id="current-conditions-sunrise-set-moonrise-set-phase-row">
+                <div class="col-2 mt-3" id="current-conditions-sunrise-col">
+                    <figure class="text-sm-center">
+                        <blockquote>
+                            <img src="../../images/sunrise.svg" alt="..." height="32px" width="32px"/> {time:format(weather.current.sunrise, 'hh:mm:ss a')}
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            sunrise
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="col-2 mt-3" id="current-conditions-sunset-col">
+                    <figure class="text-sm-center">
+                        <blockquote>
+                            <img src="../../images/sunset.svg" alt="..." height="32px" width="32px"/> {time:format(weather.current.sunset, 'hh:mm:ss a')}
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            sunset
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="col-2 mt-3" id="current-conditions-moonrise-col">
+                    <figure class="text-sm-center">
+                        <blockquote>
+                            <img src="../../images/moonrise.svg" alt="..." height="32px" width="32px"/> {time:format(weather.daily[0].moonrise, 'hh:mm:ss a')}
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            moon rise
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="col-2 mt-3" id="current-conditions-moonset-col">
+                    <figure class="text-sm-center">
+                        <blockquote>
+                            <img src="../../images/moonset.svg" alt="..." height="32px" width="32px"/> {time:format(weather.daily[0].moonset, 'hh:mm:ss a')}
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            moon set
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="col-2 mt-3" id="current-conditions-moonphase-col">
+                    <figure class="text-sm-center">
+                        <blockquote>
+                            <img src="../../images/{weather.daily[0].getMoonPhaseImage()}" alt="..." height="32px" width="32px"/> {weather.daily[0].getMoonPhaseValue()}
+                        </blockquote>
+                        <figcaption class="blockquote-footer">
+                            moon phase
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -47,6 +47,7 @@ public class WeatherResource {
     @CheckedTemplate(requireTypeSafeExpressions = false)
     public static class Templates {
         public static native TemplateInstance weather(OpenWeatherOneCallResponse weather);
+        public static native TemplateInstance weatherCurrent(OpenWeatherOneCallResponse weather);
         public static native TemplateInstance globalWeatherCurrent(OpenWeatherOneCallResponse globalWeatherCurrent);
         public static native TemplateInstance audio(AudioResponse audio);
     }

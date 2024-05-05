@@ -77,10 +77,25 @@ public class Daily implements Serializable {
     @JsonbProperty("feels_like")
     private FeelsLike feelsLike;
     @JsonbProperty
+    private String summary;
+    @JsonbProperty
     private List<Weather> weather;
 
     public String getDayOfWeek() {
         return dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+    }
+
+    public BigDecimal getPrecipInches() {
+        final BigDecimal precipInchesMultiplier = new BigDecimal("0.0393701");
+        final BigDecimal precipInches;
+        if (rain != null) {
+            precipInches = rain.multiply(precipInchesMultiplier.setScale(2, RoundingMode.HALF_UP));
+        } else if (snow != null) {
+            precipInches = snow.multiply(precipInchesMultiplier.setScale(2, RoundingMode.HALF_UP));
+        } else {
+            precipInches = BigDecimal.ZERO;
+        }
+        return precipInches;
     }
 
     /**

@@ -1,0 +1,20 @@
+{@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse weather}
+{#if weather.getAlertSize() > 0}
+    <div class="row" id="active-alerts-row">
+    <div class="col" id="alertView">
+    {#for alert in weather.alerts}
+        {#if alert.event.contains("Warning")}
+            <div class="alert alert-danger" role="alert">
+        {#else}
+            <div class="alert alert-warning" role="alert">
+        {/if}
+        <h4 class="alert-heading">{alert.senderName}</h4>
+        <p>{alert.event}</p>
+        <p class="mb-0">Start: {time:format(alert.start, 'MM-dd-yyyy hh:mm a')} End: {time:format(alert.end, 'MM-dd-yyyy hh:mm a')}</p>
+        <hr>
+        <p class="mb-0">{alert.description}</p>
+        </div>
+    {/for}
+    </div>
+    </div>
+{/if}

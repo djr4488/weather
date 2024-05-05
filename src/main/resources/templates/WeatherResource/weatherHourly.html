@@ -1,0 +1,58 @@
+{@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse weather}
+{#each weather.hourly}
+    <div class="row border" id="hourly-conditions-images-row-{it_index}">
+    <div class="col" id="hourly-conditions-images-col-{it_index}">
+    <div class="row" id="hourly-images-hour-temp-precip-{it_index}">
+        <div class="col-3" id="hourly-image-{it_index}">
+            <img src="../../images/{it.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="64px" height="64px"/>
+        </div>
+        <div class="col-3 mt-3" id="hourly-time-date-{it_index}">
+            <figure class="text-sm-left">
+                <blockquote class="blockquote">{time:format(it.dt, 'hh:mm a')}</blockquote>
+                <figcaption class="blockquote-footer">{it.dt.toLocalDate()}</figcaption>
+            </figure>
+        </div>
+        <div class="col-3 mt-3" id="hourly-temp-{it_index}">
+            <figure class="text-sm-left">
+                <blockquote class="blockquote">{it.temp.toBigInteger()}</blockquote>
+                <figcaption class="blockquote-footer">temp</figcaption>
+            </figure>
+        </div>
+        <div class="col-3 mt-3" id="hourly-precip-chance-{it_index}">
+            <figure class="text-sm-left">
+                <blockquote class="blockquote">{it.probabilityOfPrecipitation}</blockquote>
+                <figcaption class="blockquote-footer">precipitation chance</figcaption>
+            </figure>
+        </div>
+    </div>
+    <hr class="p-0" />
+    <div class="row" id="hourly-uv-wind-description-{it_index}">
+    <div class="col-4" id="hourly-uv-{it_index}">
+        <figure class="text-sm-left">
+            <blockquote class="blockquote">{it.uvi}</blockquote>
+            <figcaption class="blockquote-footer">uv index</figcaption>
+        </figure>
+    </div>
+    <div class="col-4" id="hourly-wind-{it_index}">
+        <div class="row" id="hourly-wind-compass-row-{it_index}">
+            <div class="col-3" id="hourly-wind-compass-col-{it_index}">
+                <img src="../../images/compass.svg" alt="Wind Direction {it.windDeg}" style="transform:rotate({it.getOffsetWindDeg()}deg);" height="64px" width="64px"/>
+            </div>
+            <div class="col-9" id="hourly-wind-data-col-{it_index}">
+                <figure class="text-sm-left">
+                    <blockquote class="blockquote">{it.windSpeed.toBigInteger()} / {#if it.windGust != null} {it.windGust.toBigInteger()} {/if}</blockquote>
+                    <figcaption class="blockquote-footer">wind & gusts mph</figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+    <div class="col-4" id="hourly-description-{it_index}">
+    <figure class="text-sm-left">
+    <blockquote class="blockquote">{it.weather[0].description}</blockquote>
+    <figcaption class="blockquote-footer">weather description</figcaption>
+    </figure>
+    </div>
+    </div>
+    </div>
+    </div>
+{/each}
