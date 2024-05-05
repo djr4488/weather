@@ -1,20 +1,30 @@
 {@org.djr4488.quarkus.model.onecall.OpenWeatherOneCallResponse weather}
-  <div class="row" id="current-conditions-row">
-    <div class="col-12" id="current-conditions-col">
-        <div class="row border" id="current-conditions-location">
-            <figure class="text-sm-left">
-                <blockquote class="blockquote">Current conditions for {weather.place}.</blockquote>
-            </figure>
-        </div>
-        {#if weather.getAlertSize() > 0}
-        <div class="row border" id="current-conditions-short-alerts-row">
-            <div class="col" id="current-condtions-short-alert-view">
-                {#for alert in weather.alerts}
-                {#if alert.event.contains("Warning")}
-                <div class="alert alert-danger" role="alert">
+<table class="table {#if weather.hasWarning()} table-danger {#else if weather.hasWatch()} table-warning {#else} table-dark {/if} table-borderless">
+    <thead>
+        <tr>
+            <th>Conditions</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    <div class="row" id="current-conditions-row">
+        <div class="col-12" id="current-conditions-col">
+            <div class="row" id="current-conditions-location">
+                <figure class="text-sm-left">
+                    <blockquote class="blockquote">Current conditions for {weather.place}.</blockquote>
+                </figure>
+            </div>
+            <hr class="p-0" />
+            {#if weather.getAlertSize() > 0}
+            <div class="row" id="current-conditions-short-alerts-row">
+                <div class="col" id="current-condtions-short-alert-view">
+                    {#for alert in weather.alerts}
+                    {#if alert.event.contains("Warning")}
+                    <div class="alert alert-danger" role="alert">
                     {#else}
                     <div class="alert alert-warning" role="alert">
-                        {/if}
+                    {/if}
                         <h8 class="alert-heading">{alert.senderName}</h8>
                         <p>{alert.event}</p>
                         <p class="mb-0">Start: {time:format(alert.start, 'MM-dd-yyyy hh:mm a')} End: {time:format(alert.end, 'MM-dd-yyyy hh:mm a')}</p>
@@ -24,8 +34,9 @@
                     {/for}
                 </div>
             </div>
+            <hr class="p-0" />
             {/if}
-            <div class="row border" id="current-conditions-img-temps">
+            <div class="row" id="current-conditions-img-temps">
                 <div class="col-2" id="current-conditions-img-col">
                     <img src="../../images/{weather.current.weather[0].icon}.svg" class="img-thumbnail" alt="..." width="100px" height="100px"/>
                 </div>
@@ -74,8 +85,8 @@
                     </div>
                 </div>
             </div>
-
-            <div class="row border" id="current-condtions-pressure-humidity-highlow-uv-description">
+            <hr class="p=0" />
+            <div class="row" id="current-condtions-pressure-humidity-highlow-uv-description">
                 <div id="current-conditions-temps-col" class="col-2 mt-3">
                     <div id="current-conditions-temp-high-row" class="row">
                         <div id="current-conditions-temp-high-col" class="col">
@@ -134,8 +145,8 @@
                     </figure>
                 </div>
             </div>
-
-            <div class="row border" id="current-condtions-summary-row">
+            <hr class="p=0 /"
+            <div class="row" id="current-condtions-summary-row">
                 <div class="col" id="current-conditions-summary-col">
                     <figure class="text-middle">
                         <blockquote class="blockquote">
@@ -147,8 +158,8 @@
                     </figure>
                 </div>
             </div>
-
-            <div class="row border" id="current-conditions-sunrise-set-moonrise-set-phase-row">
+            <hr class="p-0" />
+            <div class="row" id="current-conditions-sunrise-set-moonrise-set-phase-row">
                 <div class="col-2 mt-3" id="current-conditions-sunrise-col">
                     <figure class="text-sm-center">
                         <blockquote>
@@ -202,3 +213,7 @@
             </div>
         </div>
     </div>
+    </td>
+    </tr>
+    </tbody>
+</table>

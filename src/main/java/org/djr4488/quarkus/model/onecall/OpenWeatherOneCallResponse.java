@@ -43,6 +43,26 @@ public class OpenWeatherOneCallResponse implements Serializable {
         return (alerts == null || alerts.size() == 0) ? 0 : alerts.size();
     }
 
+    public boolean hasWarning() {
+        boolean warnedAlert = false;
+        if (alerts != null) {
+            for (Alert alert : alerts) {
+                if (alert.getEvent().contains("Warning")) {
+                    warnedAlert = true;
+                }
+            }
+        }
+        return warnedAlert;
+    }
+
+    public boolean hasWatch() {
+        boolean watchAlert = false;
+        if (alerts != null && !hasWarning()) {
+            watchAlert = true;
+        }
+        return watchAlert;
+    }
+
     @Override
     public String toString() {
         return JsonbBuilder.create().toJson(this);
